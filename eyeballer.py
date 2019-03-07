@@ -4,10 +4,12 @@ import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 from keras.preprocessing.image import ImageDataGenerator
 from keras.models import Sequential
-from keras.optimizers import RMSprop
+from keras.optimizers import RMSprop, Adam
 from keras.layers import Conv2D, MaxPooling2D
 from keras.layers import Activation, Dropout, Flatten, Dense
 from keras.callbacks import CSVLogger
+
+import os
 
 MODEL_SUMMARY_FILE = "model_summary.txt"
 TEST_FILE = "test_file.txt"
@@ -26,49 +28,49 @@ input_shape = (IMAGE_WIDTH, IMAGE_HEIGHT, 3)
 model = Sequential()
 
 """
-model.add(Conv2D(32, 3, 3, border_mode='same', input_shape=input_shape, activation='relu'))
-model.add(Conv2D(32, 3, 3, border_mode='same', activation='relu'))
+model.add(Conv2D(32, (3, 3), padding='same', input_shape=input_shape, activation='relu'))
+model.add(Conv2D(32, (3, 3), padding='same', activation='relu'))
 model.add(MaxPooling2D(pool_size=(2, 2)))
 """
 
-model.add(Conv2D(64, 3, 3, border_mode='same', input_shape=input_shape, activation='relu'))
-model.add(Conv2D(64, 3, 3, border_mode='same', activation='relu'))
+model.add(Conv2D(64, (3, 3), padding='same', input_shape=input_shape, activation='relu'))
+model.add(Conv2D(64, (3, 3), padding='same', activation='relu'))
 model.add(MaxPooling2D(pool_size=(2, 2)))
 
 """
-model.add(Conv2D(64, 3, 3, border_mode='same', activation='relu'))
-model.add(Conv2D(64, 3, 3, border_mode='same', activation='relu'))
+model.add(Conv2D(64, (3, 3), padding='same', activation='relu'))
+model.add(Conv2D(64, (3, 3), padding='same', activation='relu'))
 model.add(MaxPooling2D(pool_size=(2, 2)))
 """
 
-model.add(Conv2D(128, 3, 3, border_mode='same', activation='relu'))
-model.add(Conv2D(128, 3, 3, border_mode='same', activation='relu'))
+model.add(Conv2D(128, (3, 3), padding='same', activation='relu'))
+model.add(Conv2D(128, (3, 3), padding='same', activation='relu'))
 model.add(MaxPooling2D(pool_size=(2, 2)))
 
 """
-model.add(Conv2D(128, 3, 3, border_mode='same', activation='relu'))
-model.add(Conv2D(128, 3, 3, border_mode='same', activation='relu'))
+model.add(Conv2D(128, (3, 3), padding='same', activation='relu'))
+model.add(Conv2D(128, (3, 3), padding='same', activation='relu'))
 model.add(MaxPooling2D(pool_size=(2, 2)))
 """
 
-model.add(Conv2D(256, 3, 3, border_mode='same', activation='relu'))
-model.add(Conv2D(256, 3, 3, border_mode='same', activation='relu'))
-model.add(Conv2D(256, 3, 3, border_mode='same', activation='relu'))
+model.add(Conv2D(256, (3, 3), padding='same', activation='relu'))
+model.add(Conv2D(256, (3, 3), padding='same', activation='relu'))
+model.add(Conv2D(256, (3, 3), padding='same', activation='relu'))
 model.add(MaxPooling2D(pool_size=(2, 2)))
 
 """
-model.add(Conv2D(256, 3, 3, border_mode='same', activation='relu'))
-model.add(Conv2D(256, 3, 3, border_mode='same', activation='relu'))
+model.add(Conv2D(256, (3, 3), padding='same', activation='relu'))
+model.add(Conv2D(256, (3, 3), padding='same', activation='relu'))
 model.add(MaxPooling2D(pool_size=(2, 2)))
 """
-model.add(Conv2D(512, 3, 3, border_mode='same', activation='relu'))
-model.add(Conv2D(512, 3, 3, border_mode='same', activation='relu'))
-model.add(Conv2D(512, 3, 3, border_mode='same', activation='relu'))
+model.add(Conv2D(512, (3, 3), padding='same', activation='relu'))
+model.add(Conv2D(512, (3, 3), padding='same', activation='relu'))
+model.add(Conv2D(512, (3, 3), padding='same', activation='relu'))
 model.add(MaxPooling2D(pool_size=(2, 2)))
 
-model.add(Conv2D(512, 3, 3, border_mode='same', activation='relu'))
-model.add(Conv2D(512, 3, 3, border_mode='same', activation='relu'))
-model.add(Conv2D(512, 3, 3, border_mode='same', activation='relu'))
+model.add(Conv2D(512, (3, 3), padding='same', activation='relu'))
+model.add(Conv2D(512, (3, 3), padding='same', activation='relu'))
+model.add(Conv2D(512, (3, 3), padding='same', activation='relu'))
 model.add(MaxPooling2D(pool_size=(2, 2)))
 
 model.add(Flatten())
@@ -82,8 +84,14 @@ model.add(Dense(1))
 model.add(Activation('sigmoid'))
 
 model.compile(loss='binary_crossentropy',
-            optimizer=RMSprop(lr=0.0001),
+            optimizer=Adam(lr=0.01),
             metrics=['accuracy'])
+
+if os.path.isfile("errors_and_logins-weights.h5"):
+    model.load_weights("errors_and_logins-weights.h5")
+    print("Loaded model from file.")
+else:
+    print("No model to load from file")
 
 with open(MODEL_SUMMARY_FILE,"w") as fh:
     model.summary(print_fn=lambda line: fh.write(line + "\n"))
