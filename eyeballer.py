@@ -10,91 +10,54 @@ from keras.layers import Activation, Dropout, Flatten, Dense
 from keras.callbacks import CSVLogger
 
 import os
-
-MODEL_SUMMARY_FILE = "model_summary.txt"
-TEST_FILE = "test_file.txt"
-MODEL_FILE = "model-vgg16.h5"
+import argparse
 
 # Hyperparams
-IMAGE_SIZE = 200
-IMAGE_WIDTH, IMAGE_HEIGHT = IMAGE_SIZE, IMAGE_SIZE
-EPOCHS = 20
-BATCH_SIZE = 128
-TEST_SIZE = 30
+IMAGE_WIDTH, IMAGE_HEIGHT = 360, 225
+
+TEST_FILE = "test_file.txt"
+WEIGHTS_FILE = "weights.h5"
+
+# Parse the arguments
+parser = argparse.ArgumentParser(description='Give those screenshots of yours a quick eyeballing')
+parser.add_argument("--modelfile", help="Weights file for input/output")
+parser.add_argument("--batchsize", help="Batch size", default=32, type=int)
+parser.add_argument("--epochs", help="Number of epochs", default=20, type=int)
+args = parser.parse_args()
+
+if args.modelfile:
+    WEIGHTS_FILE = args.modelfile
+BATCH_SIZE = args.batchsize
+EPOCHS = args.epochs
 
 input_shape = (IMAGE_WIDTH, IMAGE_HEIGHT, 3)
 
-# Model 5
 model = Sequential()
-
-"""
-model.add(Conv2D(32, (3, 3), padding='same', input_shape=input_shape, activation='relu'))
-model.add(Conv2D(32, (3, 3), padding='same', activation='relu'))
-model.add(MaxPooling2D(pool_size=(2, 2)))
-"""
-
-model.add(Conv2D(64, (3, 3), padding='same', input_shape=input_shape, activation='relu'))
-model.add(Conv2D(64, (3, 3), padding='same', activation='relu'))
+model.add(Conv2D(32, (3, 3), input_shape=input_shape, activation="relu"))
 model.add(MaxPooling2D(pool_size=(2, 2)))
 
-"""
-model.add(Conv2D(64, (3, 3), padding='same', activation='relu'))
-model.add(Conv2D(64, (3, 3), padding='same', activation='relu'))
-model.add(MaxPooling2D(pool_size=(2, 2)))
-"""
-
-model.add(Conv2D(128, (3, 3), padding='same', activation='relu'))
-model.add(Conv2D(128, (3, 3), padding='same', activation='relu'))
+model.add(Conv2D(32, (3, 3), activation="relu"))
 model.add(MaxPooling2D(pool_size=(2, 2)))
 
-"""
-model.add(Conv2D(128, (3, 3), padding='same', activation='relu'))
-model.add(Conv2D(128, (3, 3), padding='same', activation='relu'))
-model.add(MaxPooling2D(pool_size=(2, 2)))
-"""
-
-model.add(Conv2D(256, (3, 3), padding='same', activation='relu'))
-model.add(Conv2D(256, (3, 3), padding='same', activation='relu'))
-model.add(Conv2D(256, (3, 3), padding='same', activation='relu'))
-model.add(MaxPooling2D(pool_size=(2, 2)))
-
-"""
-model.add(Conv2D(256, (3, 3), padding='same', activation='relu'))
-model.add(Conv2D(256, (3, 3), padding='same', activation='relu'))
-model.add(MaxPooling2D(pool_size=(2, 2)))
-"""
-model.add(Conv2D(512, (3, 3), padding='same', activation='relu'))
-model.add(Conv2D(512, (3, 3), padding='same', activation='relu'))
-model.add(Conv2D(512, (3, 3), padding='same', activation='relu'))
-model.add(MaxPooling2D(pool_size=(2, 2)))
-
-model.add(Conv2D(512, (3, 3), padding='same', activation='relu'))
-model.add(Conv2D(512, (3, 3), padding='same', activation='relu'))
-model.add(Conv2D(512, (3, 3), padding='same', activation='relu'))
+model.add(Conv2D(64, (3, 3), activation="relu"))
 model.add(MaxPooling2D(pool_size=(2, 2)))
 
 model.add(Flatten())
-model.add(Dense(256, activation='relu'))
+model.add(Dense(64, activation="relu"))
 model.add(Dropout(0.5))
+model.add(Dense(1, activation="sigmoid"))
 
-model.add(Dense(256, activation='relu'))
-model.add(Dropout(0.5))
-
-model.add(Dense(1))
-model.add(Activation('sigmoid'))
-
+adam = Adam(lr=.01)
 model.compile(loss='binary_crossentropy',
-            optimizer=Adam(lr=0.01),
-            metrics=['accuracy'])
+              optimizer="rmsprop",
+              metrics=['accuracy'])
 
-if os.path.isfile("errors_and_logins-weights.h5"):
-    model.load_weights("errors_and_logins-weights.h5")
+if os.path.isfile(WEIGHTS_FILE):
+    model.load_weights(WEIGHTS_FILE)
     print("Loaded model from file.")
 else:
     print("No model to load from file")
 
-with open(MODEL_SUMMARY_FILE,"w") as fh:
-    model.summary(print_fn=lambda line: fh.write(line + "\n"))
 print(model.summary())
 
 # Data augmentation
@@ -103,7 +66,7 @@ data_generator = ImageDataGenerator(
     shear_range=0.1,
     zoom_range=0.1,
     validation_split=0.2,
-    horizontal_flip=True)
+    horizontal_flip=False)
 
 # Data preparation
 training_generator = data_generator.flow_from_directory(
@@ -128,22 +91,20 @@ model.fit_generator(
     validation_steps=len(validation_generator.filenames) // BATCH_SIZE,
     verbose=1)
 
-model.save_weights(MODEL_FILE)
+print("Saving model...")
+model.save_weights(WEIGHTS_FILE)
+print("Model saved")
 
 # Testing
-probabilities = model.predict_generator(validation_generator, TEST_SIZE)
-for index, probability in enumerate(probabilities):
-    image_path = "images/" +validation_generator.filenames[index]
-    img = mpimg.imread(image_path)
-    with open(TEST_FILE,"a") as fh:
-        fh.write(str(probability[0]) + " for: " + image_path + "\n")
-    plt.imshow(img)
-    if probability > 0.5:
-        plt.title("%.2f" % (probability[0]*100) + "% dog")
-    else:
-        plt.title("%.2f" % ((1-probability[0])*100) + "% cat")
-    plt.show()
-
-model.save('model.h5')
-
-model.save_weights("errors_and_logins-weights.h5")
+# probabilities = model.predict_generator(validation_generator, TEST_SIZE)
+# for index, probability in enumerate(probabilities):
+#     image_path = "images/" + validation_generator.filenames[index]
+#     img = mpimg.imread(image_path)
+#     with open(TEST_FILE,"a") as fh:
+#         fh.write(str(probability[0]) + " for: " + image_path + "\n")
+#     plt.imshow(img)
+#     if probability > 0.5:
+#         plt.title("%.2f" % (probability[0]*100) + "% dog")
+#     else:
+#         plt.title("%.2f" % ((1-probability[0])*100) + "% cat")
+#     plt.show()
