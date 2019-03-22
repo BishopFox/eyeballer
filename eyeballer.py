@@ -1,7 +1,5 @@
 #!/usr/bin/python3
 
-print("loading")
-
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 from keras.preprocessing.image import ImageDataGenerator
@@ -26,8 +24,7 @@ import matplotlib.pyplot as plt
 import os
 import argparse
 import shutil
-
-print("loaded")
+import time
 
 # Hyperparams
 #IMAGE_WIDTH, IMAGE_HEIGHT = 360, 225
@@ -84,12 +81,15 @@ if args.predict:
     img = image.img_to_array(img)
 
     batch = img[np.newaxis, ...]
+    time_start = time.time()
     prediction = model.predict(batch, batch_size=1)
+    time_end = time.time()
+    elapsed = time_end - time_start
     print("Predictions:")
     print("\tCustom 404:", round(prediction[0][0] * 100, 2))
     print("\tLogin Page:", round(prediction[0][1] * 100, 2))
     print("\tHome Page:", round(prediction[0][2] * 100, 2))
-
+    print("Prediction Took (seconds): ", elapsed)
     exit()
 
 # for layer in base_model.layers:
