@@ -1,8 +1,11 @@
 #!/usr/bin/python3
 
+print("loading")
+
 import matplotlib.pyplot as plt
 import matplotlib.image as mpimg
 from keras.preprocessing.image import ImageDataGenerator
+from keras.preprocessing import image
 from keras.models import Sequential, Model
 from keras.optimizers import RMSprop, Adam
 from keras.layers import Conv2D, MaxPooling2D, GlobalAveragePooling2D
@@ -24,6 +27,8 @@ import os
 import argparse
 import shutil
 
+print("loaded")
+
 # Hyperparams
 #IMAGE_WIDTH, IMAGE_HEIGHT = 360, 225
 IMAGE_WIDTH, IMAGE_HEIGHT = 224, 224
@@ -38,6 +43,7 @@ parser = argparse.ArgumentParser(description='Give those screenshots of yours a 
 parser.add_argument("--modelfile", help="Weights file for input/output")
 parser.add_argument("--batchsize", help="Batch size", default=32, type=int)
 parser.add_argument("--epochs", help="Number of epochs", default=20, type=int)
+parser.add_argument("--predict", help="File to predict")
 args = parser.parse_args()
 
 if args.modelfile:
@@ -68,6 +74,24 @@ output_layer = Dense(3, activation="sigmoid", name="OutputLayer")(x)
 
 model = Model(inputs=base_model.input, outputs=output_layer)
 
+# Single predict mode
+if args.predict:
+    # Load the model from file
+    model.load_weights(WEIGHTS_FILE)
+
+    # Load the image into memory
+    img = image.load_img(args.predict, target_size=(IMAGE_WIDTH, IMAGE_HEIGHT))
+    img = image.img_to_array(img)
+
+    batch = img[np.newaxis, ...]
+    prediction = model.predict(batch, batch_size=1)
+    print("Predictions:")
+    print("\tCustom 404:", round(prediction[0][0] * 100, 2))
+    print("\tLogin Page:", round(prediction[0][1] * 100, 2))
+    print("\tHome Page:", round(prediction[0][2] * 100, 2))
+
+    exit()
+
 # for layer in base_model.layers:
 #    layer.trainable = False
 
@@ -89,7 +113,7 @@ if args.modelfile:
 data_generator = ImageDataGenerator(
     preprocessing_function = preprocess_input,
     rescale=1./255,
-    shear_range=0.2,
+    shear_range=0.0,
     zoom_range=0.2,
     samplewise_center=True,
     validation_split=0.2,
@@ -132,9 +156,10 @@ history = model.fit_generator(
     validation_steps=len(validation_generator.filenames) // BATCH_SIZE,
     verbose=1)
 
-results = model.predict_generator(validation_generator)
-print("Results: ", results)
-print("len Results: ", len(results))
+if args.modelfile:
+    print("Saving model...")
+    model.save_weights(WEIGHTS_FILE)
+    print("Model saved")
 
 # Plot training & validation accuracy values
 plt.plot(history.history['acc'])
@@ -157,10 +182,6 @@ plt.xlabel('Epoch')
 plt.legend(['Train', 'Validation'], loc='upper left')
 plt.savefig("loss.png")
 
-if args.modelfile:
-    print("Saving model...")
-    model.save_weights(WEIGHTS_FILE)
-    print("Model saved")
 
 # def confusion_matrix_evaluate(validation_generator, model):
 #     #Confution Matrix and Classification Report
