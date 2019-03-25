@@ -80,10 +80,11 @@ if args.predict:
     # Load the image into memory
     img = image.load_img(args.predict, target_size=(IMAGE_WIDTH, IMAGE_HEIGHT))
     img = image.img_to_array(img)
-
-    batch = img[np.newaxis, ...]
+    img = np.expand_dims(img, axis=0)
+    img = preprocess_input(img)
+    
     time_start = time.time()
-    prediction = model.predict(batch, batch_size=1)
+    prediction = model.predict(img, batch_size=1)
     time_end = time.time()
     elapsed = time_end - time_start
     print("Predictions:")
