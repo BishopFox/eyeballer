@@ -106,6 +106,7 @@ venv.bak/
 #screenshot data
 *.png
 *.jpg
+*.tar
 
 #model files
 *.h5
