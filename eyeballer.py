@@ -8,7 +8,7 @@ from keras.models import Sequential, Model
 from keras.optimizers import RMSprop, Adam
 from keras.layers import Conv2D, MaxPooling2D, GlobalAveragePooling2D
 from keras.layers import Activation, Dropout, Flatten, Dense
-from keras.callbacks import TensorBoard
+from keras.callbacks import TensorBoard, ModelCheckpoint
 from keras import regularizers
 
 from PIL import Image
@@ -34,6 +34,7 @@ IMAGE_DIR = "images_224x224/"
 
 TEST_FILE = "test_file.txt"
 WEIGHTS_FILE = "weights.h5"
+CHECKPOINT_FILE="weights-improvement-{epoch:02d}-{val_acc:.2f}.hdf5"
 
 # Parse the arguments
 parser = argparse.ArgumentParser(description='Give those screenshots of yours a quick eyeballing')
@@ -148,13 +149,24 @@ validation_generator = data_generator.flow_from_dataframe(
     class_mode="other")
 
 # Training
+
+#    Model checkpoint code - Saves model weights when validation accuracy improves
+checkpoint = ModelCheckpoint(CHECKPOINT_FILE, monitor='val_acc', verbose=1, save_best_only=True, mode='max')
+callbacks_list = [checkpoint]
+
+start_time = time.time()
+
 history = model.fit_generator(
     training_generator,
     steps_per_epoch=len(training_generator.filenames) // BATCH_SIZE,
     epochs=EPOCHS,
     validation_data=validation_generator,
     validation_steps=len(validation_generator.filenames) // BATCH_SIZE,
+    callbacks=callbacks_list,
     verbose=1)
+
+end_time = time.time()
+print("Total training time: {}".format(end_time-start_time))
 
 if args.modelfile:
     print("Saving model...")
