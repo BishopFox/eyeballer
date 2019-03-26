@@ -62,6 +62,11 @@ class EyeballModel:
         if summary:
             print(self.model.summary())
 
+        # Pull out our labels for use in generators later
+        data = pd.read_csv("labels.csv")
+        self.training_labels = data.loc[data['evaluation'] == False]
+        self.evaluation_labels = data.loc[data['evaluation'] == True]
+
         if weights_file is not None and os.path.isfile(weights_file):
             self.model.load_weights(weights_file)
             print("Loaded model from file.")
@@ -79,10 +84,8 @@ class EyeballModel:
             validation_split=0.2,
             horizontal_flip=False)
 
-        data = pd.read_csv("labels.csv")
-
         training_generator = data_generator.flow_from_dataframe(
-            data,
+            self.training_labels,
             directory=self.image_dir,
             x_col="filename",
             y_col=["custom404", "login", "homepage"],
@@ -92,7 +95,7 @@ class EyeballModel:
             shuffle=True,
             class_mode="other")
         validation_generator = data_generator.flow_from_dataframe(
-            data,
+            self.training_labels,
             directory=self.image_dir,
             x_col="filename",
             y_col=["custom404", "login", "homepage"],
