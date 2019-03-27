@@ -12,7 +12,7 @@ from keras.callbacks import TensorBoard, ModelCheckpoint
 from keras import regularizers
 
 from PIL import Image
-from sklearn.metrics import classification_report, confusion_matrix
+from sklearn.metrics import precision_score, recall_score
 from keras.applications.inception_v3 import InceptionV3
 from keras.applications import MobileNet
 from keras.applications.mobilenet import preprocess_input
@@ -28,7 +28,7 @@ import time
 
 # Parse the arguments
 parser = argparse.ArgumentParser(description='Give those screenshots of yours a quick eyeballing')
-parser.add_argument("mode", help="Mode of operation. One of \"train\" or \"predict\".")
+parser.add_argument("mode", help="Mode of operation. One of \"train\", \"predict\", or \"evaluate\".")
 parser.add_argument("--weights", help="Weights file for input/output")
 parser.add_argument("--batchsize", help="Batch size", default=32, type=int)
 parser.add_argument("--epochs", help="Number of epochs", default=20, type=int)
@@ -71,8 +71,9 @@ class EyeballModel:
             self.model.load_weights(weights_file)
             print("Loaded model from file.")
         else:
-            print("No model to load from file")
+            print("No model loaded from file")
 
+    # Training
     def train(self, weights_file, epochs=20, batch_size=32):
         # Data augmentation
         data_generator = ImageDataGenerator(
@@ -104,8 +105,6 @@ class EyeballModel:
             subset='validation',
             shuffle=False,
             class_mode="other")
-
-        # Training
 
         # Model checkpoint - Saves model weights when validation accuracy improves
         callbacks = []
@@ -142,7 +141,6 @@ class EyeballModel:
             plt.legend(['Train', 'Validation'], loc='upper left')
             plt.savefig("loss.png")
 
-
     # Single predict on a file
     def predict(self, filename):
         # Load the weights from file
@@ -158,10 +156,80 @@ class EyeballModel:
         prediction = self.model.predict(img, batch_size=1)
         time_end = time.time()
         print("Predictions:")
-        print("\tCustom 404:", round(prediction[0][0] * 100, 2))
-        print("\tLogin Page:", round(prediction[0][1] * 100, 2))
-        print("\tHome Page:", round(prediction[0][2] * 100, 2))
+        print("\tCustom 404:" + str(round(prediction[0][0] * 100, 2)) + "%")
+        print("\tLogin Page:" + str(round(prediction[0][1] * 100, 2)) + "%")
+        print("\tHome Page:" + str(round(prediction[0][2] * 100, 2)) + "%")
         print("Prediction Took (seconds): ", time_end - time_start)
+
+    # Evaluate performance against the persistent evaluation data set
+    def evaluate(self, threshold=0.5):
+        # Prepare the data
+        data_generator = ImageDataGenerator(
+            preprocessing_function = preprocess_input,
+            rescale=1./255)
+        evaluation_generator = data_generator.flow_from_dataframe(
+            self.evaluation_labels,
+            directory=self.image_dir,
+            x_col="filename",
+            y_col=["custom404", "login", "homepage"],
+            target_size=(self.image_width, self.image_height),
+            shuffle=False,
+            batch_size=1,
+            class_mode="other")
+        predictions = self.model.predict_generator(evaluation_generator, verbose=1, steps=len(evaluation_generator))
+        predictions = predictions > threshold
+
+        all_or_nothing_success = 0
+        correct_label_count = 0
+
+        correct_per_category_counts = [0, 0, 0]
+
+        labels = []
+
+        # Loop through each prediction from the generator and built a list out of it
+        for i, batch in enumerate(evaluation_generator):
+            labels_row = batch[1][0]
+            labels_row = labels_row > threshold
+            labels.append(list(labels_row))
+            # The generator keeps going past the end of the data set. So, manually kill it
+            if i >= len(evaluation_generator)-1:
+                break
+
+        # Zip them together, so we can evaluate easier
+        for row in zip(labels, predictions.tolist()):
+            # All or nothing count
+            if row[0] == row[1]:
+                all_or_nothing_success += 1
+            # Per-category count
+            for i in range(len(row[0])):
+                if row[0][i] == row[1][i]:
+                    correct_per_category_counts[i] += 1
+
+        custom404_labels = np.reshape(np.array(labels)[:, 0:1], len(labels)).tolist()
+        custom404_predicitons = np.reshape(np.array(predictions)[:, 0:1], len(predictions)).tolist()
+
+        login_labels = np.reshape(np.array(labels)[:, 1:2], len(labels)).tolist()
+        login_predicitons = np.reshape(np.array(predictions)[:, 1:2], len(predictions)).tolist()
+
+        homepage_labels = np.reshape(np.array(labels)[:, 2:3], len(labels)).tolist()
+        homepage_predicitons = np.reshape(np.array(predictions)[:, 2:3], len(predictions)).tolist()
+
+        custom404_precision = precision_score(custom404_labels, custom404_predicitons)
+        custom404_recall = recall_score(custom404_labels, custom404_predicitons)
+        print("Custom404 Precision Score: " + str(round(custom404_precision * 100, 2)) + "%")
+        print("Custom404 Recall Score: " + str(round(custom404_recall * 100, 2)) + "%")
+
+        login_precision = precision_score(login_labels, login_predicitons)
+        login_recall = recall_score(login_labels, login_predicitons)
+        print("Login Precision Score: " + str(round(login_precision * 100, 2)) + "%")
+        print("Login Recall Score: " + str(round(login_recall * 100, 2)) + "%")
+
+        homepage_precision = precision_score(homepage_labels, homepage_predicitons)
+        homepage_recall = recall_score(homepage_labels, homepage_predicitons)
+        print("Homepage Precision Score: " + str(round(homepage_precision * 100, 2)) + "%")
+        print("Homepage Recall Score: " + str(round(homepage_recall * 100, 2)) + "%")
+
+        print("All or nothing accuracy: " + str(round((all_or_nothing_success / len(evaluation_generator)) * 100 , 2)) + "%")
 
 
 graphs = args.graphs is not None
@@ -174,5 +242,7 @@ elif args.mode == "predict":
         print("Error: Use the --screenshot flag to specify what file you want to predict on")
     else:
         model.predict(args.screenshot)
+elif args.mode == "evaluate":
+    model.evaluate(threshold=0.5)
 else:
-    print("Error: " + args.mode + " is not a valid mode. Try one of \"train\" or \"predict\"")
+    print("Error: " + args.mode + " is not a valid mode. Try one of \"train\", \"predict\", or \"evaluate\"")
