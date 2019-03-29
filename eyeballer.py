@@ -21,6 +21,7 @@ import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
 
+import random
 import os
 import argparse
 import shutil
@@ -33,8 +34,9 @@ parser.add_argument("--weights", help="Weights file for input/output")
 parser.add_argument("--batchsize", help="Batch size", default=32, type=int)
 parser.add_argument("--epochs", help="Number of epochs", default=20, type=int)
 parser.add_argument("--screenshot", help="File to predict")
-parser.add_argument("--summary", help="Print model summary at start")
-parser.add_argument("--graphs", help="Save accuracy and loss graphs to file")
+parser.add_argument("--summary", help="Print model summary at start", action='store_true')
+parser.add_argument("--graphs", help="Save accuracy and loss graphs to file", action='store_true')
+parser.add_argument("--seed", help="RNG seed for data shuffling and transformations", default=0, type=int)
 
 args = parser.parse_args()
 
@@ -44,7 +46,7 @@ class EyeballModel:
     image_width, image_height = 224, 224
     input_shape = (image_width, image_height, 3)
 
-    def __init__(self, print_summary=False, weights_file="weights.h5", summary=False, graphs=False):
+    def __init__(self, print_summary=False, weights_file="weights.h5", seed=0):
         # Build the model
         base_model = MobileNet(weights='imagenet', include_top=False, input_shape=self.input_shape)
         x = base_model.output
@@ -56,16 +58,25 @@ class EyeballModel:
         output_layer = Dense(3, activation="sigmoid", name="OutputLayer")(x)
         self.model = Model(inputs=base_model.input, outputs=output_layer)
 
+        # for layer in base_model.layers:
+        #    layer.trainable = False
+
         adam = Adam(lr=0.0005)
         self.model.compile(optimizer=adam, loss="binary_crossentropy", metrics=["accuracy"])
 
-        if summary:
+        if print_summary:
             print(self.model.summary())
 
         # Pull out our labels for use in generators later
         data = pd.read_csv("labels.csv")
         self.training_labels = data.loc[data['evaluation'] == False]
         self.evaluation_labels = data.loc[data['evaluation'] == True]
+
+        # Shuffle the training labels
+        self.seed = seed
+        print("Using seed: " + str(seed))
+        random.seed(self.seed)
+        self.training_labels = self.training_labels.sample(frac=1)
 
         if weights_file is not None and os.path.isfile(weights_file):
             self.model.load_weights(weights_file)
@@ -74,7 +85,9 @@ class EyeballModel:
             print("No model loaded from file")
 
     # Training
-    def train(self, weights_file, epochs=20, batch_size=32):
+    def train(self, weights_file, epochs=20, batch_size=32, print_graphs=False):
+        print("Training with seed: " + str(self.seed))
+
         # Data augmentation
         data_generator = ImageDataGenerator(
             preprocessing_function = preprocess_input,
@@ -94,6 +107,7 @@ class EyeballModel:
             batch_size=batch_size,
             subset='training',
             shuffle=True,
+            seed=self.seed,
             class_mode="other")
         validation_generator = data_generator.flow_from_dataframe(
             self.training_labels,
@@ -104,6 +118,7 @@ class EyeballModel:
             batch_size=batch_size,
             subset='validation',
             shuffle=False,
+            seed=self.seed,
             class_mode="other")
 
         # Model checkpoint - Saves model weights when validation accuracy improves
@@ -119,7 +134,7 @@ class EyeballModel:
             callbacks=callbacks,
             verbose=1)
 
-        if graphs:
+        if print_graphs:
             # Plot training & validation accuracy values
             plt.plot(history.history['acc'])
             plt.plot(history.history['val_acc'])
@@ -176,6 +191,32 @@ class EyeballModel:
             shuffle=False,
             batch_size=1,
             class_mode="other")
+        # If a seed was selected, then also evaluate on the validation set for that seed
+        if args.seed > 0:
+            print("Using validation set...")
+            # Data augmentation
+            data_generator = ImageDataGenerator(
+                preprocessing_function = preprocess_input,
+                rescale=1./255,
+                shear_range=0.0,
+                zoom_range=0.2,
+                samplewise_center=True,
+                validation_split=0.2,
+                horizontal_flip=False)
+            evaluation_generator = data_generator.flow_from_dataframe(
+                self.training_labels,
+                directory=self.image_dir,
+                x_col="filename",
+                y_col=["custom404", "login", "homepage"],
+                target_size=(self.image_width, self.image_height),
+                batch_size=1,
+                subset='validation',
+                shuffle=False,
+                seed=self.seed,
+                class_mode="other")
+        else:
+            print("Using evaluation set...")
+
         predictions = self.model.predict_generator(evaluation_generator, verbose=1, steps=len(evaluation_generator))
         predictions = predictions > threshold
 
@@ -183,6 +224,7 @@ class EyeballModel:
         correct_label_count = 0
 
         correct_per_category_counts = [0, 0, 0]
+        total_correct_count = 0
 
         labels = []
 
@@ -204,6 +246,7 @@ class EyeballModel:
             for i in range(len(row[0])):
                 if row[0][i] == row[1][i]:
                     correct_per_category_counts[i] += 1
+                    total_correct_count += 1
 
         custom404_labels = np.reshape(np.array(labels)[:, 0:1], len(labels)).tolist()
         custom404_predicitons = np.reshape(np.array(predictions)[:, 0:1], len(predictions)).tolist()
@@ -229,14 +272,16 @@ class EyeballModel:
         print("Homepage Precision Score: " + str(round(homepage_precision * 100, 2)) + "%")
         print("Homepage Recall Score: " + str(round(homepage_recall * 100, 2)) + "%")
 
+        print("Overall Binary Accuracy: " + str(round((total_correct_count * 100) / (len(evaluation_generator) * 3), 2)) + "%")
         print("All or nothing accuracy: " + str(round((all_or_nothing_success / len(evaluation_generator)) * 100 , 2)) + "%")
 
+seed = args.seed
+if args.seed == 0:
+    seed = random.randint(0,999999)
 
-graphs = args.graphs is not None
-
-model = EyeballModel(weights_file=args.weights, graphs=graphs)
+model = EyeballModel(weights_file=args.weights, print_summary=args.summary, seed=seed)
 if args.mode == "train":
-    model.train(weights_file=args.weights, batch_size=args.batchsize, epochs=args.epochs)
+    model.train(weights_file=args.weights, print_graphs=args.graphs, batch_size=args.batchsize, epochs=args.epochs)
 elif args.mode == "predict":
     if args.screenshot is None:
         print("Error: Use the --screenshot flag to specify what file you want to predict on")
