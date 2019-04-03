@@ -1,31 +1,25 @@
 #!/usr/bin/python3
 
+import argparse
+import os
+import random
+import time
+
 import matplotlib.pyplot as plt
-import matplotlib.image as mpimg
-from keras.preprocessing.image import ImageDataGenerator
-from keras.preprocessing import image
-from keras.models import Sequential, Model
-from keras.optimizers import RMSprop, Adam
-from keras.layers import Conv2D, MaxPooling2D, GlobalAveragePooling2D
-from keras.layers import Activation, Dropout, Flatten, Dense
-from keras.callbacks import TensorBoard, ModelCheckpoint
-from keras import regularizers
-
-from PIL import Image
-from sklearn.metrics import precision_score, recall_score
-from keras.applications.inception_v3 import InceptionV3
-from keras.applications import MobileNet
-from keras.applications.mobilenet import preprocess_input
-
 import numpy as np
 import pandas as pd
-import matplotlib.pyplot as plt
 
-import random
-import os
-import argparse
-import shutil
-import time
+from keras import regularizers
+from keras.applications import MobileNet
+from keras.applications.mobilenet import preprocess_input
+from keras.callbacks import ModelCheckpoint
+from keras.layers import Dropout, Dense
+from keras.layers import GlobalAveragePooling2D
+from keras.models import Model
+from keras.optimizers import Adam
+from keras.preprocessing import image
+from keras.preprocessing.image import ImageDataGenerator
+from sklearn.metrics import precision_score, recall_score
 
 # Parse the arguments
 parser = argparse.ArgumentParser(description='Give those screenshots of yours a quick eyeballing')
@@ -39,6 +33,7 @@ parser.add_argument("--graphs", help="Save accuracy and loss graphs to file", ac
 parser.add_argument("--seed", help="RNG seed for data shuffling and transformations", default=0, type=int)
 
 args = parser.parse_args()
+
 
 class EyeballModel:
     checkpoint_file = "weights-snapshot.h5"
@@ -85,12 +80,12 @@ class EyeballModel:
             print("No model loaded from file")
 
     # Training
-    def train(self, weights_file, epochs=20, batch_size=32, print_graphs=False):
-        print("Training with seed: " + str(se1lf.seed))
+    def train(self, epochs=20, batch_size=32, print_graphs=False):
+        print("Training with seed: " + str(self.seed))
 
         # Data augmentation
         data_generator = ImageDataGenerator(
-            preprocessing_function = preprocess_input,
+            preprocessing_function=preprocess_input,
             shear_range=0.0,
             zoom_range=0.2,
             samplewise_center=True,
@@ -121,8 +116,8 @@ class EyeballModel:
             class_mode="other")
 
         # Model checkpoint - Saves model weights when validation accuracy improves
-        callbacks = []
-        callbacks.append(ModelCheckpoint(self.checkpoint_file, monitor='val_loss', verbose=1, save_best_only=True, save_weights_only=True, mode='min'))
+        callbacks = [ModelCheckpoint(self.checkpoint_file, monitor='val_loss', verbose=1, save_best_only=True,
+                                     save_weights_only=True, mode='min')]
 
         history = self.model.fit_generator(
             training_generator,
@@ -176,7 +171,7 @@ class EyeballModel:
     def evaluate(self, threshold=0.5):
         # Prepare the data
         data_generator = ImageDataGenerator(
-            preprocessing_function = preprocess_input)
+            preprocessing_function=preprocess_input)
         evaluation_generator = data_generator.flow_from_dataframe(
             self.evaluation_labels,
             directory=self.image_dir,
@@ -191,7 +186,7 @@ class EyeballModel:
             print("Using validation set...")
             # Data augmentation
             data_generator = ImageDataGenerator(
-                preprocessing_function = preprocess_input,
+                preprocessing_function=preprocess_input,
                 shear_range=0.0,
                 zoom_range=0.2,
                 samplewise_center=True,
@@ -215,7 +210,6 @@ class EyeballModel:
         predictions = predictions > threshold
 
         all_or_nothing_success = 0
-        correct_label_count = 0
 
         correct_per_category_counts = [0, 0, 0]
         total_correct_count = 0
@@ -258,16 +252,19 @@ class EyeballModel:
         print("Homepage Precision Score: " + str(round(homepage_precision * 100, 2)) + "%")
         print("Homepage Recall Score: " + str(round(homepage_recall * 100, 2)) + "%")
 
-        print("Overall Binary Accuracy: " + str(round((total_correct_count * 100) / (len(evaluation_generator) * 3), 2)) + "%")
-        print("All or nothing accuracy: " + str(round((all_or_nothing_success / len(evaluation_generator)) * 100 , 2)) + "%")
+        print("Overall Binary Accuracy: " + str(
+            round((total_correct_count * 100) / (len(evaluation_generator) * 3), 2)) + "%")
+        print("All or nothing accuracy: " + str(
+            round((all_or_nothing_success / len(evaluation_generator)) * 100, 2)) + "%")
+
 
 seed = args.seed
 if args.seed == 0:
-    seed = random.randint(0,999999)
+    seed = random.randint(0, 999999)
 
 model = EyeballModel(weights_file=args.weights, print_summary=args.summary, seed=seed)
 if args.mode == "train":
-    model.train(weights_file=args.weights, print_graphs=args.graphs, batch_size=args.batchsize, epochs=args.epochs)
+    model.train(print_graphs=args.graphs, batch_size=args.batchsize, epochs=args.epochs)
 elif args.mode == "predict":
     if args.screenshot is None:
         print("Error: Use the --screenshot flag to specify what file you want to predict on")
