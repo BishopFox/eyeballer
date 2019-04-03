@@ -36,12 +36,23 @@ args = parser.parse_args()
 
 
 class EyeballModel:
+    """The primary model class of Eyeballer.
+
+    Contains high-level functions for training, evaluating, and predicting.
+    """
     checkpoint_file = "weights-snapshot.h5"
     image_dir = "images_224x224/"
     image_width, image_height = 224, 224
     input_shape = (image_width, image_height, 3)
 
     def __init__(self, print_summary=False, weights_file="weights.h5", seed=0):
+        """Constructor for model class.
+
+        Keyword arguments:
+        print_summary -- Whether or not to print to stdout the keras model summary, containing a detailed description of every model layer
+        weights_file -- A filename for where to load the model's weights.
+        seed -- PRNG seed, useful for repeating a previous run and using the same data. Training/Validation split is determined randomly.
+        """
         # Build the model
         base_model = MobileNet(weights='imagenet', include_top=False, input_shape=self.input_shape)
         x = base_model.output
@@ -79,8 +90,14 @@ class EyeballModel:
         else:
             print("No model loaded from file")
 
-    # Training
     def train(self, epochs=20, batch_size=32, print_graphs=False):
+        """Train the model, making a new weights file at each successfull checkpoint. You'll probably need a GPU for this to realistically run.
+
+        Keyword arguments:
+        epochs -- The number of epochs to train for. (An epoch is one pass-through of the dataset)
+        batch_size -- How many images to batch together when training. Generally speaking, the higher the better, until you run out of memory.
+        print_graphs --- Whether or not to create accuracy and loss graphs. If true, they'll be written to accuracy.png and loss.png
+        """
         print("Training with seed: " + str(self.seed))
 
         # Data augmentation
@@ -150,8 +167,12 @@ class EyeballModel:
             plt.legend(['Train', 'Validation'], loc='upper left')
             plt.savefig("loss.png")
 
-    # Single predict on a file
     def predict(self, filename):
+    """Predict the labels for a single file
+
+    Keyword arguments:
+    filename -- The path to the file that we'll be evaluating
+    """
         # Load the image into memory
         img = image.load_img(filename, target_size=(self.image_width, self.image_height))
         img = image.img_to_array(img)
