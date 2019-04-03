@@ -51,7 +51,7 @@ class EyeballModel:
         base_model = MobileNet(weights='imagenet', include_top=False, input_shape=self.input_shape)
         x = base_model.output
         x = GlobalAveragePooling2D()(x)
-        x = Dense(512, activation="relu", name="HiddenLayer1")(x)
+        x = Dense(256, activation="relu", name="HiddenLayer1")(x)
         x = Dropout(0.5)(x)
         x = Dense(128, activation="relu", name="HiddenLayer2", kernel_regularizer=regularizers.l2(0.01))(x)
         x = Dropout(0.2)(x)
@@ -86,12 +86,11 @@ class EyeballModel:
 
     # Training
     def train(self, weights_file, epochs=20, batch_size=32, print_graphs=False):
-        print("Training with seed: " + str(self.seed))
+        print("Training with seed: " + str(se1lf.seed))
 
         # Data augmentation
         data_generator = ImageDataGenerator(
             preprocessing_function = preprocess_input,
-            rescale=1./255,
             shear_range=0.0,
             zoom_range=0.2,
             samplewise_center=True,
@@ -158,9 +157,6 @@ class EyeballModel:
 
     # Single predict on a file
     def predict(self, filename):
-        # Load the weights from file
-        self.model.load_weights(self.weights_file)
-
         # Load the image into memory
         img = image.load_img(filename, target_size=(self.image_width, self.image_height))
         img = image.img_to_array(img)
@@ -171,17 +167,16 @@ class EyeballModel:
         prediction = self.model.predict(img, batch_size=1)
         time_end = time.time()
         print("Predictions:")
-        print("\tCustom 404:" + str(round(prediction[0][0] * 100, 2)) + "%")
-        print("\tLogin Page:" + str(round(prediction[0][1] * 100, 2)) + "%")
-        print("\tHome Page:" + str(round(prediction[0][2] * 100, 2)) + "%")
+        print("\tCustom 404: " + str(round(prediction[0][0] * 100, 2)) + "%")
+        print("\tLogin Page: " + str(round(prediction[0][1] * 100, 2)) + "%")
+        print("\tHome Page: " + str(round(prediction[0][2] * 100, 2)) + "%")
         print("Prediction Took (seconds): ", time_end - time_start)
 
     # Evaluate performance against the persistent evaluation data set
     def evaluate(self, threshold=0.5):
         # Prepare the data
         data_generator = ImageDataGenerator(
-            preprocessing_function = preprocess_input,
-            rescale=1./255)
+            preprocessing_function = preprocess_input)
         evaluation_generator = data_generator.flow_from_dataframe(
             self.evaluation_labels,
             directory=self.image_dir,
@@ -197,7 +192,6 @@ class EyeballModel:
             # Data augmentation
             data_generator = ImageDataGenerator(
                 preprocessing_function = preprocess_input,
-                rescale=1./255,
                 shear_range=0.0,
                 zoom_range=0.2,
                 samplewise_center=True,
@@ -226,22 +220,14 @@ class EyeballModel:
         correct_per_category_counts = [0, 0, 0]
         total_correct_count = 0
 
-        labels = []
-
-        # Loop through each prediction from the generator and built a list out of it
-        for i, batch in enumerate(evaluation_generator):
-            labels_row = batch[1][0]
-            labels_row = labels_row > threshold
-            labels.append(list(labels_row))
-            # The generator keeps going past the end of the data set. So, manually kill it
-            if i >= len(evaluation_generator)-1:
-                break
+        labels = evaluation_generator.data.tolist()
 
         # Zip them together, so we can evaluate easier
         for row in zip(labels, predictions.tolist()):
             # All or nothing count
             if row[0] == row[1]:
                 all_or_nothing_success += 1
+
             # Per-category count
             for i in range(len(row[0])):
                 if row[0][i] == row[1][i]:
