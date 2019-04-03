@@ -168,11 +168,11 @@ class EyeballModel:
             plt.savefig("loss.png")
 
     def predict(self, filename):
-    """Predict the labels for a single file
+        """Predict the labels for a single file
 
-    Keyword arguments:
-    filename -- The path to the file that we'll be evaluating
-    """
+        Keyword arguments:
+        filename -- The path to the file that we'll be evaluating
+        """
         # Load the image into memory
         img = image.load_img(filename, target_size=(self.image_width, self.image_height))
         img = image.img_to_array(img)
@@ -188,8 +188,12 @@ class EyeballModel:
         print("\tHome Page: " + str(round(prediction[0][2] * 100, 2)) + "%")
         print("Prediction Took (seconds): ", time_end - time_start)
 
-    # Evaluate performance against the persistent evaluation data set
     def evaluate(self, threshold=0.5):
+        """Evaluate performance against the persistent evaluation data set
+
+        Keyword arguments:
+        threshold -- Value between 0->1. The cutoff where the numerical prediction becomes boolean. Default: 0.5
+        """
         # Prepare the data
         data_generator = ImageDataGenerator(
             preprocessing_function=preprocess_input)
