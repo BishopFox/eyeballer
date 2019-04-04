@@ -22,6 +22,7 @@ from keras.preprocessing.image import ImageDataGenerator
 from sklearn.metrics import precision_score, recall_score
 
 # Parse the arguments
+DATA_LABELS = ["custom404", "login", "homepage"]
 parser = argparse.ArgumentParser(description='Give those screenshots of yours a quick eyeballing')
 parser.add_argument("mode", help="Mode of operation. One of \"train\", \"predict\", or \"evaluate\".")
 parser.add_argument("--weights", help="Weights file for input/output")
@@ -114,7 +115,7 @@ class EyeballModel:
             self.training_labels,
             directory=self.image_dir,
             x_col="filename",
-            y_col=["custom404", "login", "homepage"],
+            y_col=DATA_LABELS,
             target_size=(self.image_width, self.image_height),
             batch_size=batch_size,
             subset='training',
@@ -125,7 +126,7 @@ class EyeballModel:
             self.training_labels,
             directory=self.image_dir,
             x_col="filename",
-            y_col=["custom404", "login", "homepage"],
+            y_col=DATA_LABELS,
             target_size=(self.image_width, self.image_height),
             batch_size=batch_size,
             subset='validation',
@@ -202,7 +203,7 @@ class EyeballModel:
             self.evaluation_labels,
             directory=self.image_dir,
             x_col="filename",
-            y_col=["custom404", "login", "homepage"],
+            y_col=DATA_LABELS,
             target_size=(self.image_width, self.image_height),
             shuffle=False,
             batch_size=1,
@@ -223,7 +224,7 @@ class EyeballModel:
                 self.training_labels,
                 directory=self.image_dir,
                 x_col="filename",
-                y_col=["custom404", "login", "homepage"],
+                y_col=DATA_LABELS,
                 target_size=(self.image_width, self.image_height),
                 batch_size=1,
                 subset='validation',
@@ -255,34 +256,18 @@ class EyeballModel:
                     correct_per_category_counts[i] += 1
                     total_correct_count += 1
 
-        custom404_labels = np.reshape(np.array(labels)[:, 0:1], len(labels)).tolist()
-        custom404_predicitons = np.reshape(np.array(predictions)[:, 0:1], len(predictions)).tolist()
+        stats = {label: dict() for label in DATA_LABELS}
+        for index, scores in enumerate(stats.values()):
+            data_slice = np.index_exp[:, index:index+1]  # variable is verbosely named to avoid shadowing np.slice
+            labels_column = self.get_data_column(data_slice, labels)
+            predictions_column = self.get_data_column(data_slice, predictions)
+            scores['Precision'] = precision_score(labels_column, predictions_column)
+            scores['Recall'] = recall_score(labels_column, predictions_column)
 
-        login_labels = np.reshape(np.array(labels)[:, 1:2], len(labels)).tolist()
-        login_predicitons = np.reshape(np.array(predictions)[:, 1:2], len(predictions)).tolist()
+        return stats
 
-        homepage_labels = np.reshape(np.array(labels)[:, 2:3], len(labels)).tolist()
-        homepage_predicitons = np.reshape(np.array(predictions)[:, 2:3], len(predictions)).tolist()
-
-        custom404_precision = precision_score(custom404_labels, custom404_predicitons)
-        custom404_recall = recall_score(custom404_labels, custom404_predicitons)
-        print("Custom404 Precision Score: " + str(round(custom404_precision * 100, 2)) + "%")
-        print("Custom404 Recall Score: " + str(round(custom404_recall * 100, 2)) + "%")
-
-        login_precision = precision_score(login_labels, login_predicitons)
-        login_recall = recall_score(login_labels, login_predicitons)
-        print("Login Precision Score: " + str(round(login_precision * 100, 2)) + "%")
-        print("Login Recall Score: " + str(round(login_recall * 100, 2)) + "%")
-
-        homepage_precision = precision_score(homepage_labels, homepage_predicitons)
-        homepage_recall = recall_score(homepage_labels, homepage_predicitons)
-        print("Homepage Precision Score: " + str(round(homepage_precision * 100, 2)) + "%")
-        print("Homepage Recall Score: " + str(round(homepage_recall * 100, 2)) + "%")
-
-        print("Overall Binary Accuracy: " + str(
-            round((total_correct_count * 100) / (len(evaluation_generator) * 3), 2)) + "%")
-        print("All or nothing accuracy: " + str(
-            round((all_or_nothing_success / len(evaluation_generator)) * 100, 2)) + "%")
+    def get_data_column(self, data_slice, data):
+        return np.reshape(np.array(data)[data_slice], len(data)).tolist()
 
 
 seed = args.seed

@@ -18,4 +18,5 @@ setup(
         'pillow'
     ],
     test_requires=[],
+    python_requires='>=3.6',    # We use some python 3.6+ only features, like ordered dicts by default and f-strings
 )
