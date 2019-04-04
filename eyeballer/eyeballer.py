@@ -21,19 +21,6 @@ from keras.preprocessing import image
 from keras.preprocessing.image import ImageDataGenerator
 from sklearn.metrics import precision_score, recall_score
 
-# Parse the arguments
-parser = argparse.ArgumentParser(description='Give those screenshots of yours a quick eyeballing')
-parser.add_argument("mode", help="Mode of operation. One of \"train\", \"predict\", or \"evaluate\".")
-parser.add_argument("--weights", help="Weights file for input/output")
-parser.add_argument("--batchsize", help="Batch size", default=32, type=int)
-parser.add_argument("--epochs", help="Number of epochs", default=20, type=int)
-parser.add_argument("--screenshot", help="File to predict")
-parser.add_argument("--summary", help="Print model summary at start", action='store_true')
-parser.add_argument("--graphs", help="Save accuracy and loss graphs to file", action='store_true')
-parser.add_argument("--seed", help="RNG seed for data shuffling and transformations", default=0, type=int)
-
-args = parser.parse_args()
-
 
 class EyeballModel:
     """The primary model class of Eyeballer.
@@ -45,7 +32,7 @@ class EyeballModel:
     image_width, image_height = 224, 224
     input_shape = (image_width, image_height, 3)
 
-    def __init__(self, print_summary=False, weights_file="weights.h5", seed=0):
+    def __init__(self, print_summary=False, weights_file="weights.h5", seed=None):
         """Constructor for model class.
 
         Keyword arguments:
@@ -80,7 +67,10 @@ class EyeballModel:
 
         # Shuffle the training labels
         self.seed = seed
-        print("Using seed: " + str(seed))
+        if self.seed is None:
+            self.seed = 0
+            print("No seed set, ", end='')
+        print(f"using seed: {seed}")
         random.seed(self.seed)
         self.training_labels = self.training_labels.sample(frac=1)
 
@@ -207,7 +197,7 @@ class EyeballModel:
             batch_size=1,
             class_mode="other")
         # If a seed was selected, then also evaluate on the validation set for that seed
-        if args.seed > 0:
+        if self.seed is not None:
             print("Using validation set...")
             # Data augmentation
             data_generator = ImageDataGenerator(
@@ -282,20 +272,3 @@ class EyeballModel:
         print("All or nothing accuracy: " + str(
             round((all_or_nothing_success / len(evaluation_generator)) * 100, 2)) + "%")
 
-
-seed = args.seed
-if args.seed == 0:
-    seed = random.randint(0, 999999)
-
-model = EyeballModel(weights_file=args.weights, print_summary=args.summary, seed=seed)
-if args.mode == "train":
-    model.train(print_graphs=args.graphs, batch_size=args.batchsize, epochs=args.epochs)
-elif args.mode == "predict":
-    if args.screenshot is None:
-        print("Error: Use the --screenshot flag to specify what file you want to predict on")
-    else:
-        model.predict(args.screenshot)
-elif args.mode == "evaluate":
-    model.evaluate(threshold=0.5)
-else:
-    print("Error: " + args.mode + " is not a valid mode. Try one of \"train\", \"predict\", or \"evaluate\"")
