@@ -105,6 +105,7 @@ class EyeballModel:
             preprocessing_function=preprocess_input,
             shear_range=0.0,
             zoom_range=0.2,
+            brightness_range=(0.7, 1.3),
             samplewise_center=True,
             validation_split=0.2,
             horizontal_flip=False)
@@ -214,6 +215,7 @@ class EyeballModel:
                 preprocessing_function=preprocess_input,
                 shear_range=0.0,
                 zoom_range=0.2,
+                brightness_range=(0.7, 1.3),
                 samplewise_center=True,
                 validation_split=0.2,
                 horizontal_flip=False)
