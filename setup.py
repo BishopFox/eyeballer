@@ -15,7 +15,7 @@ setup(
         'numpy',
         'pandas',
         'matplotlib',
-        'pillow'
+        'pillow', 'click'
     ],
     test_requires=[],
 )
