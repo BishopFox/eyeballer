@@ -67,11 +67,13 @@ class EyeballModel:
         self.evaluation_labels = data.loc[data['evaluation'] == True]
 
         # Shuffle the training labels
+        self.random_seed = False
         self.seed = seed
         if self.seed is None:
-            self.seed = 0
+            self.random_seed = True
+            self.seed = random.randint(0, 999999)
             print("No seed set, ", end='')
-        print(f"using seed: {seed}")
+        print(f"using seed: {self.seed}")
         random.seed(self.seed)
         self.training_labels = self.training_labels.sample(frac=1)
 
@@ -199,7 +201,7 @@ class EyeballModel:
             batch_size=1,
             class_mode="other")
         # If a seed was selected, then also evaluate on the validation set for that seed
-        if self.seed is not None:
+        if not self.random_seed:
             print("Using validation set...")
             # Data augmentation
             data_generator = ImageDataGenerator(
@@ -254,6 +256,8 @@ class EyeballModel:
             scores['Precision'] = precision_score(labels_column, predictions_column)
             scores['Recall'] = recall_score(labels_column, predictions_column)
 
+        stats["total_binary_accuracy"] = total_correct_count / (len(evaluation_generator) * len(DATA_LABELS))
+        stats["all_or_nothing_accuracy"] = all_or_nothing_success / len(evaluation_generator)
         return stats
 
     def get_data_column(self, data_slice, data):

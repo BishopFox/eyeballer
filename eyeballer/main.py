@@ -2,17 +2,14 @@
 import click
 import random
 from eyeballer import EyeballModel
-
+from pprint import pprint
 
 @click.group(invoke_without_command=True)
 @click.option('--weights', default=None, type=click.Path(), help="Weights file for input/output")
 @click.option('--summary/--no-summary', default=False, help="Print model summary at start")
-@click.option('--seed', default=None, help="RNG seed for data shuffling and transformations, defaults to random value")
+@click.option('--seed', default=None, type=int, help="RNG seed for data shuffling and transformations, defaults to random value")
 @click.pass_context
 def cli(ctx, weights, summary, seed):
-    if not seed:
-        seed = random.randint(0, 999999)
-
     model_kwargs = {"weights_file": weights,
                     "print_summary": summary,
                     "seed": seed}
@@ -48,8 +45,8 @@ def predict(ctx, screenshot):
 @click.pass_context
 def evaluate(ctx, threshold):
     model = EyeballModel(**ctx.obj['model_kwargs'])
-    model.evaluate(threshold)
-
+    results = model.evaluate(threshold)
+    pprint(results)
 
 if __name__ == '__main__':
     cli()
