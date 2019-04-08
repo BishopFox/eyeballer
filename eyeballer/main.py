@@ -1,7 +1,6 @@
 #!/env/python
 import click
 from eyeballer import EyeballModel
-from pprint import pprint
 
 
 @click.group(invoke_without_command=True)
@@ -40,13 +39,25 @@ def predict(ctx, screenshot):
         model.predict(fn)
 
 
+def pretty_print_evaluation(results):
+    """Print a human-readable summary of the evaulation results"""
+    print("Custom404 Precision Score: " + str(round(results["custom404"]["Precision"] * 100, 2)) + "%")
+    print("Custom404 Recall Score: " + str(round(results["custom404"]["Recall"] * 100, 2)) + "%")
+    print("Login Precision Score: " + str(round(results["login"]["Precision"] * 100, 2)) + "%")
+    print("Login Recall Score: " + str(round(results["login"]["Recall"] * 100, 2)) + "%")
+    print("Homepage Precision Score: " + str(round(results["homepage"]["Precision"] * 100, 2)) + "%")
+    print("Homepage Recall Score: " + str(round(results["homepage"]["Recall"] * 100, 2)) + "%")
+    print("Overall Binary Accuracy: " + str(round(results["total_binary_accuracy"] * 100, 2)) + "%")
+    print("All or nothing accuracy: " + str(round(results["all_or_nothing_accuracy"] * 100, 2)) + "%")
+
+
 @cli.command()
 @click.option('--threshold', default=.5, type=float, help="Threshold confidence for labeling")
 @click.pass_context
 def evaluate(ctx, threshold):
     model = EyeballModel(**ctx.obj['model_kwargs'])
     results = model.evaluate(threshold)
-    pprint(results)
+    pretty_print_evaluation(results)
 
 
 if __name__ == '__main__':
