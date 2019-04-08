@@ -1,1 +1,1 @@
-from eyeballer.eyeballer import EyeballModel
+from eyeballer.eyeballer import EyeballModel  # noqa: F401

@@ -63,8 +63,8 @@ class EyeballModel:
 
         # Pull out our labels for use in generators later
         data = pd.read_csv("labels.csv")
-        self.training_labels = data.loc[data['evaluation'] == False]
-        self.evaluation_labels = data.loc[data['evaluation'] == True]
+        self.training_labels = data.loc[data['evaluation'] == False]  # noqa: E712
+        self.evaluation_labels = data.loc[data['evaluation'] == True]  # noqa: E712
 
         # Shuffle the training labels
         self.random_seed = False
