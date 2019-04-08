@@ -1,8 +1,8 @@
 #!/env/python
 import click
-import random
 from eyeballer import EyeballModel
 from pprint import pprint
+
 
 @click.group(invoke_without_command=True)
 @click.option('--weights', default=None, type=click.Path(), help="Weights file for input/output")
@@ -47,6 +47,7 @@ def evaluate(ctx, threshold):
     model = EyeballModel(**ctx.obj['model_kwargs'])
     results = model.evaluate(threshold)
     pprint(results)
+
 
 if __name__ == '__main__':
     cli()

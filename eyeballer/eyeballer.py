@@ -1,6 +1,5 @@
 #!/usr/bin/python3
 
-import argparse
 import os
 import random
 import time
@@ -22,6 +21,7 @@ from keras.preprocessing.image import ImageDataGenerator
 from sklearn.metrics import precision_score, recall_score
 
 DATA_LABELS = ["custom404", "login", "homepage"]
+
 
 class EyeballModel:
     """The primary model class of Eyeballer.
