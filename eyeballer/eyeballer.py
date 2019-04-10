@@ -41,7 +41,7 @@ def predict(ctx, screenshot):
 
 def pretty_print_evaluation(results):
     """Print a human-readable summary of the evaluation"""
-    # We use 4.2% to handle all the way from 0.00% (2chars) to 100% (4chars)
+    # We use 4.2% to handle all the way from "  0.00%" (7chars) to "100.00%" (7chars)
     for label in DATA_LABELS:
         print(f"{label} Precision Score: {results[label]['precision']:4.2%}")
         print(f"{label} Precision Score: {results[label]['recall']:4.2%}")
