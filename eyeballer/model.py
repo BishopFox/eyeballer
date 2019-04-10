@@ -256,7 +256,39 @@ class EyeballModel:
 
         stats["total_binary_accuracy"] = total_correct_count / (len(evaluation_generator) * len(DATA_LABELS))
         stats["all_or_nothing_accuracy"] = all_or_nothing_success / len(evaluation_generator)
+        
+        # Collect the top 10 best and top 10 worst images in order.
+        stats["top_10_best"] = zip(self.top_images(evaluation_generator, predictions, best=True))
+        stats["top_10_worst"] = zip(self.top_images(evaluation_generator, predictions, best=False))
         return stats
+
+    def top_images(self, y_generator, y_pred, top_k=10, best=False):
+        """Collect top-k best or top-k worst predicted images
+
+        Keyword arguments:
+        y_generator -- Testing_generator. The generator object use to create predictions. It contains the filenames and data labels
+        y_pred -- The numpy array of predictions
+        top_k -- Top k elements
+        best -- True/False. Calculate either the best or worst images
+        
+        :Return -- Tuple of top-k indicies and top-k filenames
+        """
+        y_true = np.array(y_generator.data).astype(float)
+        y_pred = y_pred.astype(float)
+        
+        differences = np.abs(y_pred - y_true).sum(axis=1)
+        indicies = np.argsort(differences, axis=0)
+        
+        top_file_list = []
+        
+        if not best:
+            # Reverse numpy array
+            indicies = np.flipud(indicies)
+
+        for i in indicies[:top_k]:
+            top_file_list.append(y_generator.filenames[i])
+
+        return indicies[:top_k], top_file_list
 
     def get_data_column(self, data_slice, data):
         return np.reshape(np.array(data)[data_slice], len(data)).tolist()
