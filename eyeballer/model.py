@@ -258,25 +258,25 @@ class EyeballModel:
         stats["all_or_nothing_accuracy"] = all_or_nothing_success / len(evaluation_generator)
 
         # Collect the top 10 best and top 10 worst images in order.
-        stats["top_10_best"] = zip(self.top_images(evaluation_generator, predictions, best=True))
-        stats["top_10_worst"] = zip(self.top_images(evaluation_generator, predictions, best=False))
+        stats["top_10_best"] = self._top_images(evaluation_generator, predictions, best=True)
+        stats["top_10_worst"] = self._top_images(evaluation_generator, predictions, best=False)
         return stats
 
-    def top_images(self, y_generator, y_pred, top_k=10, best=False):
+    def _top_images(self, labels, predictions, top_k=10, best=False):
         """Collect top-k best or top-k worst predicted images
 
         Keyword arguments:
-        y_generator -- Testing_generator. The generator object use to create predictions. It contains the filenames and data labels
-        y_pred -- The numpy array of predictions
+        labels -- The keras generator that contains the filenames and data labels
+        predictions -- The numpy array of predictions
         top_k -- Top k elements
         best -- True/False. Calculate either the best or worst images
 
         :Return -- Tuple of top-k indicies and top-k filenames
         """
-        y_true = np.array(y_generator.data).astype(float)
-        y_pred = y_pred.astype(float)
+        true_labels = np.array(labels.data).astype(float)
+        predictions = predictions.astype(float)
 
-        differences = np.abs(y_pred - y_true).sum(axis=1)
+        differences = np.abs(predictions - true_labels).sum(axis=1)
         indicies = np.argsort(differences, axis=0)
 
         top_file_list = []
@@ -286,7 +286,7 @@ class EyeballModel:
             indicies = np.flipud(indicies)
 
         for i in indicies[:top_k]:
-            top_file_list.append(y_generator.filenames[i])
+            top_file_list.append(labels.filenames[i])
 
         return indicies[:top_k], top_file_list
 

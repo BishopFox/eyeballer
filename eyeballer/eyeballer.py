@@ -49,6 +49,7 @@ def pretty_print_evaluation(results):
     print("Homepage Recall Score: " + str(round(results["homepage"]["Recall"] * 100, 2)) + "%")
     print("Overall Binary Accuracy: " + str(round(results["total_binary_accuracy"] * 100, 2)) + "%")
     print("All or nothing accuracy: " + str(round(results["all_or_nothing_accuracy"] * 100, 2)) + "%")
+    print("Top 10 worst predictions:" + str(results["top_10_worst"][1]))
 
 
 @cli.command()
