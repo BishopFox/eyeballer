@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 import click
-from model import EyeballModel
+from model import EyeballModel, DATA_LABELS
+
 
 
 @click.group(invoke_without_command=True)
@@ -40,15 +41,13 @@ def predict(ctx, screenshot):
 
 
 def pretty_print_evaluation(results):
-    """Print a human-readable summary of the evaulation"""
-    print(f"Custom404 Precision Score: {results['custom404']['Precision']:2.0%}")
-    print(f"Custom404 Recall Score: {results['custom404']['Recall']:2.0%}")
-    print(f"Login Precision Score: {results['login']['Precision']:2.0%}")
-    print(f"Login Recall Score: {results['login']['Recall']:2.0%}")
-    print(f"Homepage Precision Score: {results['homepage']['Precision']:2.0%}")
-    print(f"Homepage Recall Score: {results['homepage']['Recall']:2.0%}")
-    print(f"Overall Binary Accuracy: {results['total_binary_accuracy']:2.0%}")
-    print(f"All or nothing accuracy: {results['all_or_nothing_accuracy']:2.0%}")
+    """Print a human-readable summary of the evaluation"""
+    # We use 4.0% to handle all the way from 0% (2chars) to 100% (4chars)
+    for label in DATA_LABELS:
+        print(f"{label} Precision Score: {results[label]['Precision']:4.0%}")
+        print(f"{label} Precision Score: {results[label]['Recall']:4.0%}")
+    print(f"Overall Binary Accuracy: {results['total_binary_accuracy']:4.0%}")
+    print(f"All or nothing accuracy: {results['all_or_nothing_accuracy']:4.0%}")
 
 
 @cli.command()
