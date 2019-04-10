@@ -30,6 +30,7 @@ class EyeballModel:
     image_dir = "images_224x224/"
     image_width, image_height = 224, 224
     input_shape = (image_width, image_height, 3)
+    labels = 
 
     def __init__(self, print_summary=False, weights_file="weights.h5", seed=None):
         """Constructor for model class.
@@ -240,9 +241,7 @@ class EyeballModel:
             buckets -- The number of buckets to divide the data into. Default: 10
             :Returns -- Nothing returned, saves the images into "histograms.png"
         """
-
-        # TODO - These labels need to be stored within the class as self.lables and called accordingly
-        labels = ["custom404", "login", "homepage"]
+        labels = DATA_LABELS
         class_count = len(labels)
         fig,ax = plt.subplots(nrows=class_count)
         for i in range(class_count):
