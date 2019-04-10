@@ -40,15 +40,15 @@ def predict(ctx, screenshot):
 
 
 def pretty_print_evaluation(results):
-    """Print a human-readable summary of the evaulation results"""
-    print("Custom404 Precision Score: " + str(round(results["custom404"]["Precision"] * 100, 2)) + "%")
-    print("Custom404 Recall Score: " + str(round(results["custom404"]["Recall"] * 100, 2)) + "%")
-    print("Login Precision Score: " + str(round(results["login"]["Precision"] * 100, 2)) + "%")
-    print("Login Recall Score: " + str(round(results["login"]["Recall"] * 100, 2)) + "%")
-    print("Homepage Precision Score: " + str(round(results["homepage"]["Precision"] * 100, 2)) + "%")
-    print("Homepage Recall Score: " + str(round(results["homepage"]["Recall"] * 100, 2)) + "%")
-    print("Overall Binary Accuracy: " + str(round(results["total_binary_accuracy"] * 100, 2)) + "%")
-    print("All or nothing accuracy: " + str(round(results["all_or_nothing_accuracy"] * 100, 2)) + "%")
+    """Print a human-readable summary of the evaulation"""
+    print(f"Custom404 Precision Score: {results['custom404']['Precision']:2.0%}")
+    print(f"Custom404 Recall Score: {results['custom404']['Recall']:2.0%}")
+    print(f"Login Precision Score: {results['login']['Precision']:2.0%}")
+    print(f"Login Recall Score: {results['login']['Recall']:2.0%}")
+    print(f"Homepage Precision Score: {results['homepage']['Precision']:2.0%}")
+    print(f"Homepage Recall Score: {results['homepage']['Recall']:2.0%}")
+    print(f"Overall Binary Accuracy: {results['total_binary_accuracy']:2.0%}")
+    print(f"All or nothing accuracy: {results['all_or_nothing_accuracy']:2.0%}")
 
 
 @cli.command()
