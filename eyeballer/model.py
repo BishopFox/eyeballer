@@ -227,7 +227,6 @@ class EyeballModel:
         predictions = self.model.predict_generator(evaluation_generator, verbose=1, steps=len(evaluation_generator))
         predictions = predictions > threshold
         ground_truth = evaluation_generator.data
-        
         stats = classification_report(ground_truth, predictions, target_names=DATA_LABELS, output_dict=True)
         stats["total_binary_accuracy"] = jaccard_similarity_score(ground_truth, predictions)
         stats["all_or_nothing_accuracy"] = accuracy_score(ground_truth, predictions)
