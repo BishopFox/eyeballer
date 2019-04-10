@@ -16,7 +16,7 @@ from keras.models import Model
 from keras.optimizers import Adam
 from keras.preprocessing import image
 from keras.preprocessing.image import ImageDataGenerator
-from sklearn.metrics import precision_score, recall_score
+from sklearn.metrics import classification_report, accuracy_score, hamming_loss
 
 DATA_LABELS = ["custom404", "login", "homepage"]
 
@@ -226,38 +226,10 @@ class EyeballModel:
 
         predictions = self.model.predict_generator(evaluation_generator, verbose=1, steps=len(evaluation_generator))
         predictions = predictions > threshold
-
-        all_or_nothing_success = 0
-
-        correct_per_category_counts = [0, 0, 0]
-        total_correct_count = 0
-
-        labels = evaluation_generator.data.tolist()
-
-        # Zip them together, so we can evaluate easier
-        for row in zip(labels, predictions.tolist()):
-            # All or nothing count
-            if row[0] == row[1]:
-                all_or_nothing_success += 1
-
-            # Per-category count
-            for i in range(len(row[0])):
-                if row[0][i] == row[1][i]:
-                    correct_per_category_counts[i] += 1
-                    total_correct_count += 1
-
-        stats = {label: dict() for label in DATA_LABELS}
-        for index, scores in enumerate(stats.values()):
-            data_slice = np.index_exp[:, index:index+1]  # variable is verbosely named to avoid shadowing np.slice
-            labels_column = self.get_data_column(data_slice, labels)
-            predictions_column = self.get_data_column(data_slice, predictions)
-            scores['Precision'] = precision_score(labels_column, predictions_column)
-            scores['Recall'] = recall_score(labels_column, predictions_column)
-
-        stats["total_binary_accuracy"] = total_correct_count / (len(evaluation_generator) * len(DATA_LABELS))
-        stats["all_or_nothing_accuracy"] = all_or_nothing_success / len(evaluation_generator)
-
-        # Collect the top 10 best and top 10 worst images in order.
+        ground_truth = evaluation_generator.data
+        stats = classification_report(ground_truth, predictions, target_names=DATA_LABELS, output_dict=True)
+        stats["total_binary_accuracy"] = 1 - hamming_loss(ground_truth, predictions)
+        stats["all_or_nothing_accuracy"] = accuracy_score(ground_truth, predictions)
         stats["top_10_best"] = self._top_images(evaluation_generator, predictions, best=True)
         stats["top_10_worst"] = self._top_images(evaluation_generator, predictions, best=False)
         return stats

@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 import click
-from model import EyeballModel
+from model import EyeballModel, DATA_LABELS
 
 
 @click.group(invoke_without_command=True)
@@ -40,16 +40,14 @@ def predict(ctx, screenshot):
 
 
 def pretty_print_evaluation(results):
-    """Print a human-readable summary of the evaulation results"""
-    print("Custom404 Precision Score: " + str(round(results["custom404"]["Precision"] * 100, 2)) + "%")
-    print("Custom404 Recall Score: " + str(round(results["custom404"]["Recall"] * 100, 2)) + "%")
-    print("Login Precision Score: " + str(round(results["login"]["Precision"] * 100, 2)) + "%")
-    print("Login Recall Score: " + str(round(results["login"]["Recall"] * 100, 2)) + "%")
-    print("Homepage Precision Score: " + str(round(results["homepage"]["Precision"] * 100, 2)) + "%")
-    print("Homepage Recall Score: " + str(round(results["homepage"]["Recall"] * 100, 2)) + "%")
-    print("Overall Binary Accuracy: " + str(round(results["total_binary_accuracy"] * 100, 2)) + "%")
-    print("All or nothing accuracy: " + str(round(results["all_or_nothing_accuracy"] * 100, 2)) + "%")
-    print("Top 10 worst predictions:" + str(results["top_10_worst"][1]))
+    """Print a human-readable summary of the evaluation"""
+    # We use 4.2% to handle all the way from 0.00% (2chars) to 100% (4chars)
+    for label in DATA_LABELS:
+        print(f"{label} Precision Score: {results[label]['precision']:4.2%}")
+        print(f"{label} Precision Score: {results[label]['recall']:4.2%}")
+    print(f"Overall Binary Accuracy: {results['total_binary_accuracy']:4.2%}")
+    print(f"All or nothing accuracy: {results['all_or_nothing_accuracy']:4.2%}")
+    print(f"Top 10 worst predictions: {results['top_10_worst'][1]}")
 
 
 @cli.command()
