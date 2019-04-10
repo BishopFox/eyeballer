@@ -256,7 +256,7 @@ class EyeballModel:
 
         stats["total_binary_accuracy"] = total_correct_count / (len(evaluation_generator) * len(DATA_LABELS))
         stats["all_or_nothing_accuracy"] = all_or_nothing_success / len(evaluation_generator)
-        
+
         # Collect the top 10 best and top 10 worst images in order.
         stats["top_10_best"] = zip(self.top_images(evaluation_generator, predictions, best=True))
         stats["top_10_worst"] = zip(self.top_images(evaluation_generator, predictions, best=False))
@@ -270,17 +270,17 @@ class EyeballModel:
         y_pred -- The numpy array of predictions
         top_k -- Top k elements
         best -- True/False. Calculate either the best or worst images
-        
+
         :Return -- Tuple of top-k indicies and top-k filenames
         """
         y_true = np.array(y_generator.data).astype(float)
         y_pred = y_pred.astype(float)
-        
+
         differences = np.abs(y_pred - y_true).sum(axis=1)
         indicies = np.argsort(differences, axis=0)
-        
+
         top_file_list = []
-        
+
         if not best:
             # Reverse numpy array
             indicies = np.flipud(indicies)
