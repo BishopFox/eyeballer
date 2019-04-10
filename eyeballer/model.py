@@ -225,6 +225,7 @@ class EyeballModel:
             print("Using evaluation set...")
 
         predictions = self.model.predict_generator(evaluation_generator, verbose=1, steps=len(evaluation_generator))
+        self.save_prediction_histograms(predictions)
         predictions = predictions > threshold
         ground_truth = evaluation_generator.data
         stats = classification_report(ground_truth, predictions, target_names=DATA_LABELS, output_dict=True)
@@ -254,7 +255,6 @@ class EyeballModel:
         fig.set_size_inches(5,3*class_count)
         fig.tight_layout()
         plt.savefig("histograms.png")
-        plt.show()
 
     def get_data_column(self, data_slice, data):
         return np.reshape(np.array(data)[data_slice], len(data)).tolist()
