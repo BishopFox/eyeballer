@@ -16,7 +16,7 @@ from keras.models import Model
 from keras.optimizers import Adam
 from keras.preprocessing import image
 from keras.preprocessing.image import ImageDataGenerator
-from sklearn.metrics import classification_report, accuracy_score, jaccard_similarity_score
+from sklearn.metrics import classification_report, accuracy_score, hamming_loss
 
 DATA_LABELS = ["custom404", "login", "homepage"]
 
@@ -228,7 +228,7 @@ class EyeballModel:
         predictions = predictions > threshold
         ground_truth = evaluation_generator.data
         stats = classification_report(ground_truth, predictions, target_names=DATA_LABELS, output_dict=True)
-        stats["total_binary_accuracy"] = jaccard_similarity_score(ground_truth, predictions)
+        stats["total_binary_accuracy"] = 1 - hamming_loss(ground_truth, predictions)
         stats["all_or_nothing_accuracy"] = accuracy_score(ground_truth, predictions)
         return stats
 
