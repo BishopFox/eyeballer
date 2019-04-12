@@ -18,7 +18,7 @@ from keras.preprocessing import image
 from keras.preprocessing.image import ImageDataGenerator
 from sklearn.metrics import classification_report, accuracy_score, hamming_loss
 
-DATA_LABELS = ["custom404", "login", "homepage"]
+DATA_LABELS = ["custom404", "login", "homepage", "oldlooking"]
 
 
 class EyeballModel:
@@ -47,7 +47,7 @@ class EyeballModel:
         x = Dropout(0.5)(x)
         x = Dense(128, activation="relu", name="HiddenLayer2", kernel_regularizer=regularizers.l2(0.01))(x)
         x = Dropout(0.2)(x)
-        output_layer = Dense(3, activation="sigmoid", name="OutputLayer")(x)
+        output_layer = Dense(len(DATA_LABELS), activation="sigmoid", name="OutputLayer")(x)
         self.model = Model(inputs=base_model.input, outputs=output_layer)
 
         # for layer in base_model.layers:
