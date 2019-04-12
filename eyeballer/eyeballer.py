@@ -44,7 +44,7 @@ def pretty_print_evaluation(results):
     # We use 4.2% to handle all the way from "  0.00%" (7chars) to "100.00%" (7chars)
     for label in DATA_LABELS:
         print(f"{label} Precision Score: {results[label]['precision']:4.2%}")
-        print(f"{label} Precision Score: {results[label]['recall']:4.2%}")
+        print(f"{label} Recall Score: {results[label]['recall']:4.2%}")
     print(f"Overall Binary Accuracy: {results['total_binary_accuracy']:4.2%}")
     print(f"All or nothing accuracy: {results['all_or_nothing_accuracy']:4.2%}")
     print(f"Top 10 worst predictions: {results['top_10_worst'][1]}")
