@@ -30,7 +30,6 @@ class EyeballModel:
     image_dir = "images_224x224/"
     image_width, image_height = 224, 224
     input_shape = (image_width, image_height, 3)
-    labels = 
 
     def __init__(self, print_summary=False, weights_file="weights.h5", seed=None):
         """Constructor for model class.
