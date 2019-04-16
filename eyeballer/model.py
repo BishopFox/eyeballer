@@ -233,25 +233,23 @@ class EyeballModel:
         stats["all_or_nothing_accuracy"] = accuracy_score(ground_truth, predictions)
         return stats
 
-    def save_prediction_histograms(self, predictions, buckets=10):
+    def save_prediction_histograms(self, predictions, buckets=50):
         """Saves a series of histogram screenshots
+
             Keyword arguments:
-            x -- The numpy array of predicted labels, ranging from 0->1.
-            buckets -- The number of buckets to divide the data into. Default: 10
+            predictions -- The numpy array of predicted labels, ranging from 0->1.
+            buckets -- The number of buckets to divide the data into. Default: 50
             :Returns -- Nothing returned, saves the images into "histograms.png"
         """
-        labels = DATA_LABELS
-        class_count = len(labels)
-        fig, ax = plt.subplots(nrows=class_count)
-        for i in range(class_count):
-            label = labels[i]
-            n, bins, patchs = ax[i].hist(predictions[:, i], buckets, alpha=.75)
-            ax[i].set_xlabel("Prediction")
-            ax[i].set_ylabel("Counts of Predictions")
-            ax[i].set_title(label)
-            ax[i].grid(True)
-        fig.set_size_inches(5, 3*class_count)
-        fig.tight_layout()
+        figure, axes = plt.subplots(nrows=len(DATA_LABELS))
+        for i, label in enumerate(DATA_LABELS):
+            axes[i].hist(predictions[:, i], buckets, alpha=.75)
+            axes[i].set_xlabel("Prediction")
+            axes[i].set_ylabel("Counts of Predictions")
+            axes[i].set_title(label)
+            axes[i].grid(True)
+        figure.set_size_inches(5, 3*len(DATA_LABELS))
+        figure.tight_layout()
         plt.savefig("histograms.png")
 
     def get_data_column(self, data_slice, data):
