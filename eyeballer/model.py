@@ -5,6 +5,7 @@ import time
 import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
+import Augmentor
 
 from keras import regularizers
 from keras.applications import MobileNet
@@ -17,6 +18,7 @@ from keras.optimizers import Adam
 from keras.preprocessing import image
 from keras.preprocessing.image import ImageDataGenerator
 from sklearn.metrics import classification_report, accuracy_score, hamming_loss
+from augmentation import EyeballerAugmentation
 
 DATA_LABELS = ["custom404", "login", "homepage", "oldlooking"]
 
@@ -26,7 +28,7 @@ class EyeballModel:
 
     Contains high-level functions for training, evaluating, and predicting.
     """
-    checkpoint_file = "weights-snapshot.h5"
+    checkpoint_file = "weights.h5"
     image_dir = "images_224x224/"
     image_width, image_height = 224, 224
     input_shape = (image_width, image_height, 3)
@@ -51,7 +53,7 @@ class EyeballModel:
         self.model = Model(inputs=base_model.input, outputs=output_layer)
 
         # for layer in base_model.layers:
-        #    layer.trainable = False
+        #     layer.trainable = False
 
         adam = Adam(lr=0.0005)
         self.model.compile(optimizer=adam, loss="binary_crossentropy", metrics=["accuracy"])
@@ -81,6 +83,20 @@ class EyeballModel:
         else:
             print("No model loaded from file")
 
+        # Data augmentation
+        augmentor = Augmentor.Pipeline()
+        augmentor.set_seed(self.seed)
+        augmentor.zoom(probability=0.75, min_factor=0.8, max_factor=1.2)
+        augmentor.random_color(probability=0.75, min_factor=0.5, max_factor=1.0)
+        augmentor.random_contrast(probability=0.75, min_factor=0.8, max_factor=1.0)
+        augmentor.random_brightness(probability=0.75, min_factor=0.8, max_factor=1.2)
+        augmentor.random_erasing(probability=0.75, rectangle_area=0.15)
+
+        # Finalizes the augmentation with a custom operation to prepare the image for the specific pretrained model we're using
+        training_augmentation = EyeballerAugmentation()
+        augmentor.add_operation(training_augmentation)
+        self.preprocess_training_function = augmentor.keras_preprocess_func()
+
     def train(self, epochs=20, batch_size=32, print_graphs=False):
         """Train the model, making a new weights file at each successfull checkpoint. You'll probably need a GPU for this to realistically run.
 
@@ -91,15 +107,10 @@ class EyeballModel:
         """
         print("Training with seed: " + str(self.seed))
 
-        # Data augmentation
         data_generator = ImageDataGenerator(
-            preprocessing_function=preprocess_input,
-            shear_range=0.0,
-            zoom_range=0.2,
-            brightness_range=(0.7, 1.3),
-            samplewise_center=True,
+            preprocessing_function=self.preprocess_training_function,
             validation_split=0.2,
-            horizontal_flip=False)
+            samplewise_center=True)
 
         training_generator = data_generator.flow_from_dataframe(
             self.training_labels,
@@ -203,13 +214,9 @@ class EyeballModel:
             print("Using validation set...")
             # Data augmentation
             data_generator = ImageDataGenerator(
-                preprocessing_function=preprocess_input,
-                shear_range=0.0,
-                zoom_range=0.2,
-                brightness_range=(0.7, 1.3),
+                preprocessing_function=self.preprocess_training_function,
                 samplewise_center=True,
-                validation_split=0.2,
-                horizontal_flip=False)
+                validation_split=0.2)
             evaluation_generator = data_generator.flow_from_dataframe(
                 self.training_labels,
                 directory=self.image_dir,
