@@ -234,7 +234,7 @@ class EyeballModel:
         return stats
 
     def save_prediction_histograms(self, predictions, buckets=10):
-        """Saves a series of histogram screenshots 
+        """Saves a series of histogram screenshots
             Keyword arguments:
             x -- The numpy array of predicted labels, ranging from 0->1.
             buckets -- The number of buckets to divide the data into. Default: 10
@@ -242,15 +242,15 @@ class EyeballModel:
         """
         labels = DATA_LABELS
         class_count = len(labels)
-        fig,ax = plt.subplots(nrows=class_count)
+        fig, ax = plt.subplots(nrows=class_count)
         for i in range(class_count):
             label = labels[i]
-            n, bins, patchs = ax[i].hist(predictions[:,i], buckets, alpha=.75)
+            n, bins, patchs = ax[i].hist(predictions[:, i], buckets, alpha=.75)
             ax[i].set_xlabel("Prediction")
             ax[i].set_ylabel("Counts of Predictions")
             ax[i].set_title(label)
             ax[i].grid(True)
-        fig.set_size_inches(5,3*class_count)
+        fig.set_size_inches(5, 3*class_count)
         fig.tight_layout()
         plt.savefig("histograms.png")
 
