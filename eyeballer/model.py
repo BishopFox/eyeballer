@@ -28,6 +28,7 @@ class EyeballModel:
 
     Contains high-level functions for training, evaluating, and predicting.
     """
+    graphs_directory = "graphs/"
     checkpoint_file = "weights.h5"
     image_dir = "images_224x224/"
     image_width, image_height = 224, 224
@@ -149,6 +150,8 @@ class EyeballModel:
             verbose=1)
 
         if print_graphs:
+            if not os.path.exists(self.graphs_directory):
+                os.makedirs(self.graphs_directory)
             # Plot training & validation accuracy values
             plt.plot(history.history['acc'])
             plt.plot(history.history['val_acc'])
@@ -156,7 +159,7 @@ class EyeballModel:
             plt.ylabel('Accuracy')
             plt.xlabel('Epoch')
             plt.legend(['Train', 'Validation'], loc='upper left')
-            plt.savefig("accuracy.png")
+            plt.savefig(self.graphs_directory + "accuracy.png")
             plt.clf()
             plt.cla()
             plt.close()
@@ -168,7 +171,7 @@ class EyeballModel:
             plt.ylabel('Loss')
             plt.xlabel('Epoch')
             plt.legend(['Train', 'Validation'], loc='upper left')
-            plt.savefig("loss.png")
+            plt.savefig(self.graphs_directory + "loss.png")
 
     def predict(self, filename):
         """Predict the labels for a single file
@@ -276,7 +279,7 @@ class EyeballModel:
             Keyword arguments:
             predictions -- The numpy array of predicted labels, ranging from 0->1.
             buckets -- The number of buckets to divide the data into. Default: 50
-            :Returns -- Nothing returned, saves the images into "histograms.png"
+            :Returns -- Nothing"
         """
         figure, axes = plt.subplots(nrows=len(DATA_LABELS))
         for i, label in enumerate(DATA_LABELS):
@@ -287,4 +290,6 @@ class EyeballModel:
             axes[i].grid(True)
         figure.set_size_inches(5, 3*len(DATA_LABELS))
         figure.tight_layout()
-        plt.savefig("histograms.png")
+        if not os.path.exists(self.graphs_directory):
+            os.makedirs(self.graphs_directory)
+        plt.savefig(self.graphs_directory + "label_histograms.png")
