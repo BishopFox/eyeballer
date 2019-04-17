@@ -232,6 +232,7 @@ class EyeballModel:
             print("Using evaluation set...")
 
         predictions = self.model.predict_generator(evaluation_generator, verbose=1, steps=len(evaluation_generator))
+        self.save_prediction_histograms(predictions)
         predictions = predictions > threshold
         ground_truth = evaluation_generator.data
         stats = classification_report(ground_truth, predictions, target_names=DATA_LABELS, output_dict=True)
@@ -268,6 +269,25 @@ class EyeballModel:
             top_file_list.append(labels.filenames[i])
 
         return indicies[:top_k], top_file_list
+
+    def save_prediction_histograms(self, predictions, buckets=50):
+        """Saves a series of histogram screenshots
+
+            Keyword arguments:
+            predictions -- The numpy array of predicted labels, ranging from 0->1.
+            buckets -- The number of buckets to divide the data into. Default: 50
+            :Returns -- Nothing returned, saves the images into "histograms.png"
+        """
+        figure, axes = plt.subplots(nrows=len(DATA_LABELS))
+        for i, label in enumerate(DATA_LABELS):
+            axes[i].hist(predictions[:, i], buckets, alpha=.75)
+            axes[i].set_xlabel("Prediction")
+            axes[i].set_ylabel("Counts of Predictions")
+            axes[i].set_title(label)
+            axes[i].grid(True)
+        figure.set_size_inches(5, 3*len(DATA_LABELS))
+        figure.tight_layout()
+        plt.savefig("histograms.png")
 
     def get_data_column(self, data_slice, data):
         return np.reshape(np.array(data)[data_slice], len(data)).tolist()
