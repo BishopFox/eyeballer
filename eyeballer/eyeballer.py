@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 import click
+import csv
+
 from model import EyeballModel, DATA_LABELS
 
 
@@ -31,12 +33,22 @@ def train(ctx, graphs, batchsize, epochs):
 
 
 @cli.command()
-@click.argument('screenshot', nargs=-1)  # Nargs=-1 means you can pass as many in as you want
+@click.argument('screenshot')
 @click.pass_context
 def predict(ctx, screenshot):
     model = EyeballModel(**ctx.obj['model_kwargs'])
-    for fn in screenshot:
-        model.predict(fn)
+    results = model.predict(screenshot)
+    if not results:
+        print("Error: Input file does not exist")
+    if len(results) == 1:
+        print(results)
+    else:
+        with open("results.csv", "w", newline="") as csvfile:
+            fieldnames = ["filename", "custom404", "login", "homepage", "oldlooking"]
+            labelwriter = csv.DictWriter(csvfile, fieldnames=fieldnames)
+            labelwriter.writeheader()
+            labelwriter.writerows(results)
+        print("Output written to results.csv")
 
 
 def pretty_print_evaluation(results):

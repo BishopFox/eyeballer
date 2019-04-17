@@ -1,6 +1,5 @@
 import os
 import random
-import time
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -173,26 +172,39 @@ class EyeballModel:
             plt.legend(['Train', 'Validation'], loc='upper left')
             plt.savefig(self.graphs_directory + "loss.png")
 
-    def predict(self, filename):
+    def predict(self, path):
         """Predict the labels for a single file
 
         Keyword arguments:
-        filename -- The path to the file that we'll be evaluating
+        path -- The path to the file that we'll be evaluating
         """
-        # Load the image into memory
-        img = image.load_img(filename, target_size=(self.image_width, self.image_height))
-        img = image.img_to_array(img)
-        img = np.expand_dims(img, axis=0)
-        img = preprocess_input(img)
+        # Is this a single file, or a directory?
+        screenshots = []
+        if os.path.isfile(path):
+            screenshots = [path]
+        elif os.path.isdir(path):
+            screenshots = os.listdir(path)
+        else:
+            return None
 
-        time_start = time.time()
-        prediction = self.model.predict(img, batch_size=1)
-        time_end = time.time()
-        print("Predictions:")
-        print("\tCustom 404: " + str(round(prediction[0][0] * 100, 2)) + "%")
-        print("\tLogin Page: " + str(round(prediction[0][1] * 100, 2)) + "%")
-        print("\tHome Page: " + str(round(prediction[0][2] * 100, 2)) + "%")
-        print("Prediction Took (seconds): ", time_end - time_start)
+        results = []
+        for screenshot in screenshots:
+            # Load the image into memory
+            img = image.load_img(path + "/" + screenshot, target_size=(self.image_width, self.image_height))
+            img = image.img_to_array(img)
+            img = np.expand_dims(img, axis=0)
+            img = preprocess_input(img)
+
+            prediction = self.model.predict(img, batch_size=1)
+            result = dict()
+            result["filename"] = screenshot
+            result["custom404"] = prediction[0][0]
+            result["login"] = prediction[0][1]
+            result["homepage"] = prediction[0][2]
+            result["oldlooking"] = prediction[0][3]
+            results.append(result)
+
+        return results
 
     def evaluate(self, threshold=0.5):
         """Evaluate performance against the persistent evaluation data set
