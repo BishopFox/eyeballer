@@ -184,13 +184,14 @@ class EyeballModel:
             screenshots = [path]
         elif os.path.isdir(path):
             screenshots = os.listdir(path)
+            screenshots = [os.path.join(path, s) for s in screenshots]
         else:
             return None
 
         results = []
         for screenshot in screenshots:
             # Load the image into memory
-            img = image.load_img(path + "/" + screenshot, target_size=(self.image_width, self.image_height))
+            img = image.load_img(screenshot, target_size=(self.image_width, self.image_height))
             img = image.img_to_array(img)
             img = np.expand_dims(img, axis=0)
             img = preprocess_input(img)
