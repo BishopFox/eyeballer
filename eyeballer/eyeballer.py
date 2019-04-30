@@ -3,6 +3,8 @@ import click
 import csv
 
 from model import EyeballModel, DATA_LABELS
+from visualization import HeatMap
+from matplotlib import pyplot as plt
 
 
 @click.group(invoke_without_command=True)
@@ -38,6 +40,13 @@ def train(ctx, graphs, batchsize, epochs):
 def predict(ctx, screenshot):
     model = EyeballModel(**ctx.obj['model_kwargs'])
     results = model.predict(screenshot)
+
+    # Generate a heatmap
+    heatmap = HeatMap(screenshot, model)
+    heatmap_array = heatmap.generate()
+    plt.imshow(heatmap_array, interpolation='nearest')
+    plt.savefig("test.png")
+
     if not results:
         print("Error: Input file does not exist")
     if len(results) == 1:

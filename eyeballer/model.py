@@ -172,6 +172,24 @@ class EyeballModel:
             plt.legend(['Train', 'Validation'], loc='upper left')
             plt.savefig(self.graphs_directory + "loss.png")
 
+    def predict_on_array(self, image):
+        """Predict the labels for a single screenshot
+
+        Keyword arguments:
+        image -- The numpy array of the image to classify
+        """
+        img = np.expand_dims(image, axis=0)
+        img = preprocess_input(img)
+
+        prediction = self.model.predict(img, batch_size=1)
+        result = dict()
+        result["filename"] = "custom-image"
+        result["custom404"] = prediction[0][0]
+        result["login"] = prediction[0][1]
+        result["homepage"] = prediction[0][2]
+        result["oldlooking"] = prediction[0][3]
+        return result
+
     def predict(self, path):
         """Predict the labels for a single file
 
