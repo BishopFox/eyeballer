@@ -267,7 +267,7 @@ class EyeballModel:
         prediction_manager = PredictionManager()
 
         try:
-            output = self.model.predict_generator(
+            self.model.predict_generator(
                 evaluation_generator,
                 callbacks=[prediction_manager],
                 verbose=1,
