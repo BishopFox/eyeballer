@@ -1,0 +1,9 @@
+Augmentor
+click
+keras
+matplotlib
+numpy
+pandas
+pillow
+sklearn
+tensorflow

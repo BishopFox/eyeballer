@@ -113,3 +113,4 @@ venv.bak/
 *.model
 *.csv
 *.txt
+!requirements.txt
