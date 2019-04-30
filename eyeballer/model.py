@@ -3,7 +3,7 @@ import random
 
 # Prevent Tkinter Dependency
 import matplotlib
-matplotlib.use('agg')
+matplotlib.use('agg')  # noqa: E402
 import matplotlib.pyplot as plt
 
 import numpy as np
