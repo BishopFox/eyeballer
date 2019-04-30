@@ -2,7 +2,6 @@ import numpy as np
 import math
 from keras.preprocessing import image
 from copy import deepcopy
-from keras.applications.mobilenet import preprocess_input
 
 
 class HeatMap():
