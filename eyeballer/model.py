@@ -1,7 +1,11 @@
 import os
 import random
 
+# Prevent Tkinter Dependency
+import matplotlib
+matplotlib.use('agg')
 import matplotlib.pyplot as plt
+
 import numpy as np
 import pandas as pd
 import Augmentor
