@@ -22,8 +22,21 @@ from keras.preprocessing import image
 from keras.preprocessing.image import ImageDataGenerator
 from sklearn.metrics import classification_report, accuracy_score, hamming_loss
 from augmentation import EyeballerAugmentation
+from keras.callbacks import Callback
 
 DATA_LABELS = ["custom404", "login", "homepage", "oldlooking"]
+
+
+class PredictionManager(Callback):
+    def __init__(self):
+        super(PredictionManager, self).__init__()
+        self.predictions = []
+
+    def getPredictions(self):
+        return np.array(self.predictions)
+
+    def on_predict_batch_end(self, batch, logs=None):
+        self.predictions.append(logs['outputs'][0].tolist()[0])
 
 
 class EyeballModel:
@@ -251,7 +264,22 @@ class EyeballModel:
         else:
             print("Using evaluation set...")
 
-        predictions = self.model.predict_generator(evaluation_generator, verbose=1, steps=len(evaluation_generator))
+        prediction_manager = PredictionManager()
+
+        try:
+            self.model.predict_generator(
+                evaluation_generator,
+                callbacks=[prediction_manager],
+                verbose=1,
+                steps=len(evaluation_generator))
+        except KeyboardInterrupt:
+            print('\r\nJob interrupted (Ctrl+C): Outputting completed results')
+
+        predictions = prediction_manager.getPredictions()
+
+        # Truncates evaluation generator if test was interrupted
+        evaluation_generator._data = evaluation_generator.data[:predictions.shape[0]]
+
         self._save_prediction_histograms(predictions)
         predictions = predictions > threshold
         ground_truth = evaluation_generator.data
