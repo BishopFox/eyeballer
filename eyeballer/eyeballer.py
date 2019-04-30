@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 import click
 import csv
+from conv_filter_visualization import visualize_layer
+from keras import layers
+import deep_dream
 
 from model import EyeballModel, DATA_LABELS
 
@@ -70,6 +73,30 @@ def evaluate(ctx, threshold):
     results = model.evaluate(threshold)
     pretty_print_evaluation(results)
 
+
+@cli.command()
+@click.argument('layer', default=None, required=False)
+@click.pass_context
+def visualize(ctx, layer):
+    model = EyeballModel(**ctx.obj['model_kwargs']).model
+    if not layer:
+        layer_dict = dict([(layer.name, layer) for layer in model.layers[1:]])
+        print("Layers:")
+        for k in layer_dict.keys():
+            if isinstance(layer_dict[k], layers.Conv2D):
+                print("\t" + k)
+    else:
+        visualize_layer(model, layer)
+
+@cli.command()
+@click.option('--base-image-path', type=click.Path(),
+                    help='Path to the image to transform.')
+@click.option('--result-prefix', type=click.Path(),
+                    help='Prefix for the saved results.')
+@click.pass_context
+def deepdream(ctx, base_image_path, result_prefix):
+    model = EyeballModel(**ctx.obj['model_kwargs']).model
+    deep_dream.process(model, base_image_path, result_prefix)
 
 if __name__ == '__main__':
     cli()
