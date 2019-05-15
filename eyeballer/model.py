@@ -98,7 +98,7 @@ class EyeballModel:
         if weights_file is not None and os.path.isfile(weights_file):
             try:
                 self.model.load_weights(weights_file)
-            except OSError as e:
+            except OSError:
                 print(f"ERROR: Unable to open weights file '{weights_file}'")
                 sys.exit(-1)
             print("Loaded model from file.")
