@@ -1,5 +1,6 @@
 import os
 import random
+import sys
 
 # Prevent Tkinter Dependency
 import matplotlib
@@ -50,7 +51,7 @@ class EyeballModel:
     image_width, image_height = 224, 224
     input_shape = (image_width, image_height, 3)
 
-    def __init__(self, print_summary=False, weights_file="weights.h5", seed=None):
+    def __init__(self, weights_file, print_summary=False, seed=None):
         """Constructor for model class.
 
         Keyword arguments:
@@ -95,10 +96,16 @@ class EyeballModel:
         self.training_labels = self.training_labels.sample(frac=1)
 
         if weights_file is not None and os.path.isfile(weights_file):
-            self.model.load_weights(weights_file)
+            try:
+                self.model.load_weights(weights_file)
+            except OSError as e:
+                print(f"ERROR: Unable to open weights file '{weights_file}'")
+                sys.exit(-1)
             print("Loaded model from file.")
         else:
-            print("No model loaded from file")
+            if weights_file is not None:
+                raise FileNotFoundError
+            print("WARN: No model loaded from file. Generating random model")
 
         # Data augmentation
         augmentor = Augmentor.Pipeline()
