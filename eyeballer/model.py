@@ -313,7 +313,38 @@ class EyeballModel:
         stats["all_or_nothing_accuracy"] = accuracy_score(ground_truth, predictions)
         stats["top_10_best"] = self._top_images(evaluation_generator, predictions, best=True)
         stats["top_10_worst"] = self._top_images(evaluation_generator, predictions, best=False)
+        stats["none_of_the_above_recall"] = self._none_of_the_above_recall(ground_truth, predictions)
+        stats["none_of_the_above_precision"] = self._none_of_the_above_precision(ground_truth, predictions)
         return stats
+
+    def _none_of_the_above_recall(self, labels, predictions):
+        """Returns the recall score for the 'none of the above' images.
+        That means, all the images that don't have a category.
+        """
+        total_count = 0
+        correct_count = 0
+        for item in zip(labels.astype(int), predictions.astype(int)):
+            # Is this a none of the above?
+            if not item[0].any():
+                total_count += 1
+                if not item[1].any():
+                    correct_count += 1
+        return correct_count / total_count
+
+    def _none_of_the_above_precision(self, labels, predictions):
+        """Returns the precision score for the 'none of the above' images.
+        That means, all the images that don't have a category.
+        """
+        total_count = 0
+        correct_count = 0
+        for item in zip(labels.astype(int), predictions.astype(int)):
+            # Is this a none of the above prediction?
+            if not item[1].any():
+                total_count += 1
+                if not item[0].any():
+                    correct_count += 1
+        print(correct_count, total_count)
+        return correct_count / total_count
 
     def _top_images(self, labels, predictions, top_k=10, best=False):
         """Collect top-k best or top-k worst predicted images

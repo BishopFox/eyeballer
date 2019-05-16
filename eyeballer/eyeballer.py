@@ -64,8 +64,10 @@ def pretty_print_evaluation(results):
     for label in DATA_LABELS:
         print(f"{label} Precision Score: {results[label]['precision']:4.2%}")
         print(f"{label} Recall Score: {results[label]['recall']:4.2%}")
+    print(f"'None of the above' Precision: {results['none_of_the_above_precision']:4.2%}")
+    print(f"'None of the above' Recall: {results['none_of_the_above_recall']:4.2%}")
+    print(f"All or nothing Accuracy: {results['all_or_nothing_accuracy']:4.2%}")
     print(f"Overall Binary Accuracy: {results['total_binary_accuracy']:4.2%}")
-    print(f"All or nothing accuracy: {results['all_or_nothing_accuracy']:4.2%}")
     print(f"Top 10 worst predictions: {results['top_10_worst'][1]}")
 
 
