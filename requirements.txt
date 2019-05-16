@@ -1,9 +1,0 @@
-Augmentor
-click
-matplotlib
-numpy
-pandas
-pillow
-sklearn
-tensorflow
-git+https://github.com/keras-team/keras/

@@ -3,7 +3,7 @@ import math
 from keras.preprocessing import image
 from copy import deepcopy
 from matplotlib import pyplot as plt
-from model import DATA_LABELS
+from eyeballer.model import DATA_LABELS
 
 
 class HeatMap():
