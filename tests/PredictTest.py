@@ -2,7 +2,8 @@ import errno
 import os
 import unittest
 
-from eyeballer.model import EyeballModel, DATA_LABELS
+from eyeballer.model import EyeballModel
+
 
 class PredictTest(unittest.TestCase):
     def setUp(self):
@@ -10,9 +11,9 @@ class PredictTest(unittest.TestCase):
         if not os.path.isfile(weights_file):
             print("Error: Symlink the latest weights file to 'latest_weights.h5'")
             raise FileNotFoundError(
-            errno.ENOENT,
-            os.strerror(errno.ENOENT),
-            weights_file)
+                errno.ENOENT,
+                os.strerror(errno.ENOENT),
+                weights_file)
 
         model_kwargs = {
             "weights_file": weights_file,
@@ -51,15 +52,15 @@ class PredictTest(unittest.TestCase):
 
         self.assertEquals(results_one, results_two)
 
-    def get_prediction_by_name(self,results):
+    def get_prediction_by_name(self, results):
         prediction = None
         max_val = 0.0
 
         print(results)
         for k, v in results[0].items():
             if not isinstance(v, str) and v > max_val:
-                    prediction = k
-                    max_val = v
+                prediction = k
+                max_val = v
         return prediction
 
     def test_predict_custom404(self):
