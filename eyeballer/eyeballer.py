@@ -2,6 +2,7 @@
 
 import click
 import csv
+import os
 
 from eyeballer.model import EyeballModel, DATA_LABELS
 from eyeballer.visualization import HeatMap
@@ -9,10 +10,17 @@ from eyeballer.visualization import HeatMap
 
 @click.group(invoke_without_command=True)
 @click.option('--weights', default=None, type=click.Path(), help="Weights file for input/output")
+@click.option('-v', '--verbose', default=False, help="Verbose TensorFlow Output")
 @click.option('--summary/--no-summary', default=False, help="Print model summary at start")
 @click.option('--seed', default=None, type=int, help="RNG seed for data shuffling and transformations, defaults to random value")
 @click.pass_context
-def cli(ctx, weights, summary, seed):
+def cli(ctx, weights, verbose, summary, seed):
+    if ctx.invoked_subcommand is None:
+        print(ctx.get_help())
+
+    if not verbose:
+        os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+
     model_kwargs = {"weights_file": weights,
                     "print_summary": summary,
                     "seed": seed}
