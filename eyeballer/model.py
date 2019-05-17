@@ -343,7 +343,6 @@ class EyeballModel:
                 total_count += 1
                 if not item[0].any():
                     correct_count += 1
-        print(correct_count, total_count)
         return correct_count / total_count
 
     def _top_images(self, labels, predictions, top_k=10, best=False):
