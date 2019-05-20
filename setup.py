@@ -6,7 +6,7 @@ setup(
     packages=find_packages(exclude=["tests"]),
     url='https://github.com/BishopFox/eyeballer',
     license='GNU General Public License v3.0',
-    author='Daniel Petro',
+    author='Bishop Fox',
     author_email='',
     description='',
     entry_points={
@@ -22,7 +22,7 @@ setup(
         'pandas',
         'pillow',
         'sklearn',
-        'tensorflow',
+        'tensorflow-gpu',
         'keras @ git+https://github.com/keras-team/keras',
     ],
     dependency_links=[
