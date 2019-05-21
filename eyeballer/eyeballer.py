@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
+
 import click
 import csv
 
-from model import EyeballModel, DATA_LABELS
-from visualization import HeatMap
+from eyeballer.model import EyeballModel, DATA_LABELS
+from eyeballer.visualization import HeatMap
 
 
 @click.group(invoke_without_command=True)

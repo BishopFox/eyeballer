@@ -22,7 +22,7 @@ from keras.optimizers import Adam
 from keras.preprocessing import image
 from keras.preprocessing.image import ImageDataGenerator
 from sklearn.metrics import classification_report, accuracy_score, hamming_loss
-from augmentation import EyeballerAugmentation
+from eyeballer.augmentation import EyeballerAugmentation
 from keras.callbacks import Callback
 
 DATA_LABELS = ["custom404", "login", "homepage", "oldlooking"]
@@ -228,7 +228,7 @@ class EyeballModel:
             screenshots = os.listdir(path)
             screenshots = [os.path.join(path, s) for s in screenshots]
         else:
-            return None
+            raise FileNotFoundError
 
         results = []
         for screenshot in screenshots:
