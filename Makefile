@@ -32,7 +32,11 @@ endif
 	$(PIP) install --upgrade -r $(REQUIREMENTS)
 
 	@echo -e $(TAG)Installing Eyeballer$(END)
-	$(PIP) install --upgrade --editable .
+ifeq ($(shell lspci | grep NVIDIA),NVIDIA))
+	$(PIP) install --upgrade --editable .[tf_gpu]
+else
+	$(PIP) install --upgrade --editable .[tf]
+endif
 
 ifeq ($(strip $(MAKECMDGOALS)),conda)
 	@echo -e $(TAG)Activate virtualenv to run eyeballer: $(END)

@@ -22,9 +22,12 @@ setup(
         'pandas',
         'pillow',
         'sklearn',
-        'tensorflow-gpu',
         'keras @ git+https://github.com/keras-team/keras',
     ],
+    extras_require={
+    'tf': ['tensorflow'],
+    'tf_gpu': ['tensorflow-gpu'],
+    },
     dependency_links=[
     ],
 )
