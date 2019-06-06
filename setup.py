@@ -23,7 +23,7 @@ setup(
         'pillow',
         'sklearn',
         'tensorflow-gpu',
-        'keras @ git+https://github.com/keras-team/keras',
+        'keras',
     ],
     dependency_links=[
     ],

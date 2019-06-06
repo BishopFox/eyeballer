@@ -23,21 +23,8 @@ from keras.preprocessing import image
 from keras.preprocessing.image import ImageDataGenerator
 from sklearn.metrics import classification_report, accuracy_score, hamming_loss
 from eyeballer.augmentation import EyeballerAugmentation
-from keras.callbacks import Callback
 
 DATA_LABELS = ["custom404", "login", "homepage", "oldlooking"]
-
-
-class PredictionManager(Callback):
-    def __init__(self):
-        super(PredictionManager, self).__init__()
-        self.predictions = []
-
-    def getPredictions(self):
-        return np.array(self.predictions)
-
-    def on_predict_batch_end(self, batch, logs=None):
-        self.predictions.append(logs['outputs'][0].tolist()[0])
 
 
 class EyeballModel:
@@ -289,30 +276,20 @@ class EyeballModel:
         else:
             print("Using evaluation set...")
 
-        prediction_manager = PredictionManager()
-
-        try:
-            self.model.predict_generator(
-                evaluation_generator,
-                callbacks=[prediction_manager],
-                verbose=1,
-                steps=len(evaluation_generator))
-        except KeyboardInterrupt:
-            print('\r\nJob interrupted (Ctrl+C): Outputting completed results')
-
-        predictions = prediction_manager.getPredictions()
-
-        # Truncates evaluation generator if test was interrupted
-        evaluation_generator._data = evaluation_generator.data[:predictions.shape[0]]
+        predictions = self.model.predict_generator(
+            evaluation_generator,
+            verbose=1,
+            steps=len(evaluation_generator))
 
         self._save_prediction_histograms(predictions)
         predictions = predictions > threshold
-        ground_truth = evaluation_generator.data
+        ground_truth = self.evaluation_labels[DATA_LABELS].to_numpy()
+        filenames = self.evaluation_labels[["filename"]].to_numpy()
         stats = classification_report(ground_truth, predictions, target_names=DATA_LABELS, output_dict=True)
         stats["total_binary_accuracy"] = 1 - hamming_loss(ground_truth, predictions)
         stats["all_or_nothing_accuracy"] = accuracy_score(ground_truth, predictions)
-        stats["top_10_best"] = self._top_images(evaluation_generator, predictions, best=True)
-        stats["top_10_worst"] = self._top_images(evaluation_generator, predictions, best=False)
+        stats["top_10_best"] = self._top_images(filenames, ground_truth, predictions, best=True)
+        stats["top_10_worst"] = self._top_images(filenames, ground_truth, predictions, best=False)
         stats["none_of_the_above_recall"] = self._none_of_the_above_recall(ground_truth, predictions)
         stats["none_of_the_above_precision"] = self._none_of_the_above_precision(ground_truth, predictions)
         return stats
@@ -329,6 +306,9 @@ class EyeballModel:
                 total_count += 1
                 if not item[1].any():
                     correct_count += 1
+        if total_count == 0:
+            print("WARNING: None of the Above Recall is NaN")
+            return 0
         return correct_count / total_count
 
     def _none_of_the_above_precision(self, labels, predictions):
@@ -343,20 +323,23 @@ class EyeballModel:
                 total_count += 1
                 if not item[0].any():
                     correct_count += 1
+        if total_count == 0:
+            print("WARNING: None of the Above Precision is NaN")
+            return 0
         return correct_count / total_count
 
-    def _top_images(self, labels, predictions, top_k=10, best=False):
+    def _top_images(self, filenames, ground_truth, predictions, top_k=10, best=False):
         """Collect top-k best or top-k worst predicted images
 
         Keyword arguments:
-        labels -- The keras generator that contains the filenames and data labels
+        ground_truth -- The correct labels
         predictions -- The numpy array of predictions
         top_k -- Top k elements
         best -- True/False. Calculate either the best or worst images
 
         :Return -- Tuple of top-k indicies and top-k filenames
         """
-        true_labels = np.array(labels.data).astype(float)
+        true_labels = np.array(ground_truth).astype(float)
         predictions = predictions.astype(float)
 
         differences = np.abs(predictions - true_labels).sum(axis=1)
@@ -369,7 +352,7 @@ class EyeballModel:
             indicies = np.flipud(indicies)
 
         for i in indicies[:top_k]:
-            top_file_list.append(labels.filenames[i])
+            top_file_list.append(filenames[i][0])
 
         return indicies[:top_k], top_file_list
 
