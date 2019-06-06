@@ -56,7 +56,76 @@ def predict(ctx, screenshot, heatmap):
             labelwriter = csv.DictWriter(csvfile, fieldnames=fieldnames)
             labelwriter.writeheader()
             labelwriter.writerows(results)
+        
+
+        print("###############################\n##########################")
+        print(results)
+        print("###############################\n##########################")
         print("Output written to results.csv")
+
+        buildHTML(processDC(results))
+        print("HTML is created in Results.html")
+
+
+#NEW ---
+
+
+
+def processDC(dc):
+    goodDC=[]
+    for item in dc:
+        a_b=''
+        tmp_list={}
+        for key, attr in item.items():
+            print(key,attr)
+          
+            if key=='filename':
+                tmp_list['filename']=attr
+
+                tmp_list['tags']=''
+            elif attr > 0.5:
+                a_b+=(str(key)+' ') 
+                print("Adding " + a_b)
+        tmp_list['tags']+=a_b
+        print(tmp_list)
+        goodDC.append(tmp_list)
+        print(goodDC)
+        
+        
+    return goodDC
+
+
+def buildHTML(dc):
+
+    html_main = '''
+    <link rel="stylesheet" type="text/css" href="html_support/style.css">
+
+    <div id="btnsCont">
+      <button class="btn all" onclick="filterSelection('all')"> Show all</button>
+      <button class="btn" onclick="filterSelection('404')"> 404</button>
+      <button class="btn" onclick="filterSelection('login')"> Login</button>
+      <button class="btn" onclick="filterSelection('home')"> Home Page</button>
+      <button class="btn" onclick="filterSelection('old')"> Old Looking</button>
+    </div>
+    <div class="container">
+    '''
+    
+    for pic_info in dc:
+        html_main+=('<div class="filterDiv ' + str(pic_info['tags']) + 'show"><p>'+ str(pic_info['tags']) + '</p><p>Filepath - ' + str(pic_info['filename']) + '</p><img class="res_pic" src="' + str(pic_info['filename']) + '"></div>\n')
+
+    html_main +='''
+    </div>
+    <script src="html_support/javasc.js"></script>
+
+    '''
+    
+    with open('Results.html', 'w') as file:
+        file.write(html_main)
+
+    print(html_main)
+
+
+#NEW ---
 
 
 def pretty_print_evaluation(results):

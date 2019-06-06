@@ -1,0 +1,48 @@
+.container {
+  overflow: hidden;
+}
+.res_pic{
+width:100%;
+height:auto;
+}
+.filterDiv {
+  float: left;
+  background-color: #2196F3;
+  color: #ffffff;
+  width: 20%;
+  line-height: auto;
+  text-align: center;
+  margin: 10px;;
+  display: none; /* Hidden by default */
+}
+
+/* The "show" class is added to the filtered elements */
+.show {
+  display: block;
+}
+
+/* Style the buttons */
+.btn {
+	
+  border: none;
+  outline: none;
+  padding: 12px 16px;
+  margin-left:10px;
+  background-color: #f1f1f1;
+  cursor: pointer;
+}
+
+/* Add a light grey background on mouse-over */
+.btn:hover {
+  background-color: #ddd;
+}
+
+/* Add a dark background to the active button */
+.btn.active {
+  background-color: #666;
+  color: white;
+}
+.btn.all {
+  background-color: #193b72;
+  color: white;
+}
