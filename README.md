@@ -10,6 +10,11 @@ Download required packages on pip:
 sudo pip3 install -r requirements.txt
 ```
 
+Or if you want GPU support:
+```
+sudo pip3 install -r requirements-gpu.txt
+```
+
 ## Predicting Labels
 To eyeball some screenshots, just run the "predict" mode:
 

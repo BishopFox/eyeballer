@@ -5,5 +5,5 @@ numpy
 pandas
 pillow
 sklearn
-tensorflow
+tensorflow-gpu
 keras
