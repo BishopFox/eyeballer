@@ -78,7 +78,7 @@ class EyeballModel:
             self.random_seed = True
             self.seed = random.randint(0, 999999)
             print("No seed set, ", end='')
-        print(f"using seed: {self.seed}")
+        print("using seed: {}".format(self.seed))
         random.seed(self.seed)
         self.training_labels = self.training_labels.sample(frac=1)
 
@@ -86,7 +86,7 @@ class EyeballModel:
             try:
                 self.model.load_weights(weights_file)
             except OSError:
-                print(f"ERROR: Unable to open weights file '{weights_file}'")
+                print("ERROR: Unable to open weights file '{}'".foramt(weights_file))
                 sys.exit(-1)
             print("Loaded model from file.")
         else:
