@@ -59,7 +59,7 @@ def predict(ctx, screenshot, heatmap):
         
 
         print("###############################\n##########################")
-        print(results)
+        #print(results)
         print("###############################\n##########################")
         print("Output written to results.csv")
 
@@ -77,7 +77,7 @@ def processDC(dc):
         a_b=''
         tmp_list={}
         for key, attr in item.items():
-            print(key,attr)
+            #print(key,attr)
           
             if key=='filename':
                 tmp_list['filename']=attr
@@ -85,11 +85,11 @@ def processDC(dc):
                 tmp_list['tags']=''
             elif attr > 0.5:
                 a_b+=(str(key)+' ') 
-                print("Adding " + a_b)
+                #print("Adding " + a_b)
         tmp_list['tags']+=a_b
-        print(tmp_list)
+        #print(tmp_list)
         goodDC.append(tmp_list)
-        print(goodDC)
+        #print(goodDC)
         
         
     return goodDC
@@ -111,7 +111,7 @@ def buildHTML(dc):
     '''
     
     for pic_info in dc:
-        html_main+=('<div class="filterDiv ' + str(pic_info['tags']) + 'show"><p>'+ str(pic_info['tags']) + '</p><p>Filepath - ' + str(pic_info['filename']) + '</p><img class="res_pic" src="' + str(pic_info['filename']) + '"></div>\n')
+        html_main+=('<div class="filterDiv ' + str(pic_info['tags']) + 'show"><a href=' + str(pic_info['filename'])  + '>'+ str(pic_info['tags']).upper() + '</a><img class="res_pic" src="' + str(pic_info['filename']) + '"></div>\n')
 
     html_main +='''
     </div>
@@ -122,7 +122,7 @@ def buildHTML(dc):
     with open('Results.html', 'w') as file:
         file.write(html_main)
 
-    print(html_main)
+    #print(html_main)
 
 
 #NEW ---

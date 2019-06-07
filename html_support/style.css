@@ -4,15 +4,33 @@
 .res_pic{
 width:100%;
 height:auto;
+
+}
+
+a{
+font-weight:bold;
+padding:3px;
+text-decoration: none;
+color:#ffffff;
+font-size:16px;
+
+}
+
+.name{
+float:left;
 }
 .filterDiv {
   float: left;
-  background-color: #2196F3;
+  background-color: #777;
   color: #ffffff;
-  width: 20%;
-  line-height: auto;
+  width: 22%;
+  border-style:solid;
+  border-color:#666;
   text-align: center;
-  margin: 10px;;
+  
+  margin: 10px;
+  line-height: 30px;
+
   display: none; /* Hidden by default */
 }
 
