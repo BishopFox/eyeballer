@@ -19,7 +19,6 @@ from keras.layers import Dropout, Dense
 from keras.layers import GlobalAveragePooling2D
 from keras.models import Model
 from keras.optimizers import Adam
-from keras.preprocessing import image
 from keras.preprocessing.image import ImageDataGenerator
 from sklearn.metrics import classification_report, accuracy_score, hamming_loss
 from eyeballer.augmentation import EyeballerAugmentation
@@ -201,11 +200,12 @@ class EyeballModel:
         result["oldlooking"] = prediction[0][3]
         return result
 
-    def predict(self, path):
+    def predict(self, path, threshold=0.5):
         """Predict the labels for a single file
 
         Keyword arguments:
-        path -- The path to the file that we'll be evaluating
+        path -- The path to the file that we'll be evaluating.
+            NOTE: This actually has to be a directory containing a directory with our files. Because Keras is dumb. Don't ask.
         """
         # Is this a single file, or a directory?
         screenshots = []
@@ -217,23 +217,30 @@ class EyeballModel:
         else:
             raise FileNotFoundError
 
+        # Prepare the data
+        data_generator = ImageDataGenerator(
+            preprocessing_function=preprocess_input)
+        prediction_generator = data_generator.flow_from_directory(
+            directory=path,
+            target_size=(self.image_width, self.image_height),
+            shuffle=False,
+            class_mode=None)
+
+        predictions = self.model.predict_generator(
+            prediction_generator,
+            verbose=1,
+            steps=len(prediction_generator))
+
+        predictions = predictions > threshold
         results = []
-        for screenshot in screenshots:
-            # Load the image into memory
-            img = image.load_img(screenshot, target_size=(self.image_width, self.image_height))
-            img = image.img_to_array(img)
-            img = np.expand_dims(img, axis=0)
-            img = preprocess_input(img)
-
-            prediction = self.model.predict(img, batch_size=1)
+        for filename, prediction in zip(prediction_generator.filenames, predictions):
             result = dict()
-            result["filename"] = screenshot
-            result["custom404"] = prediction[0][0]
-            result["login"] = prediction[0][1]
-            result["homepage"] = prediction[0][2]
-            result["oldlooking"] = prediction[0][3]
+            result["filename"] = filename
+            result["custom404"] = prediction[0]
+            result["login"] = prediction[1]
+            result["homepage"] = prediction[2]
+            result["oldlooking"] = prediction[3]
             results.append(result)
-
         return results
 
     def evaluate(self, threshold=0.5):
