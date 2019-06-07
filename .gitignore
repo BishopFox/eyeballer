@@ -114,3 +114,4 @@ venv.bak/
 *.csv
 *.txt
 !requirements.txt
+!requirements-gpu.txt

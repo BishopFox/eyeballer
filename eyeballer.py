@@ -132,13 +132,13 @@ def pretty_print_evaluation(results):
     """Print a human-readable summary of the evaluation"""
     # We use 4.2% to handle all the way from "  0.00%" (7chars) to "100.00%" (7chars)
     for label in DATA_LABELS:
-        print(f"{label} Precision Score: {results[label]['precision']:4.2%}")
-        print(f"{label} Recall Score: {results[label]['recall']:4.2%}")
-    print(f"'None of the above' Precision: {results['none_of_the_above_precision']:4.2%}")
-    print(f"'None of the above' Recall: {results['none_of_the_above_recall']:4.2%}")
-    print(f"All or nothing Accuracy: {results['all_or_nothing_accuracy']:4.2%}")
-    print(f"Overall Binary Accuracy: {results['total_binary_accuracy']:4.2%}")
-    print(f"Top 10 worst predictions: {results['top_10_worst'][1]}")
+        print("{} Precision Score: {:4.2%}".format(label, results[label]['precision']))
+        print("{} Recall Score: {:4.2%}".format(label, results[label]['recall']))
+    print("'None of the above' Precision: {:4.2%}".format(results['none_of_the_above_precision']))
+    print("'None of the above' Recall: {:4.2%}".format(results['none_of_the_above_recall']))
+    print("All or nothing Accuracy: {:4.2%}".format(results['all_or_nothing_accuracy']))
+    print("Overall Binary Accuracy: {:4.2%}".format(results['total_binary_accuracy']))
+    print("Top 10 worst predictions: {}".format(results['top_10_worst'][1]))
 
 
 @cli.command()
