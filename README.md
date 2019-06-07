@@ -3,25 +3,16 @@ Give those screenshots of yours a quick eyeballing.
 
 Eyeballer is meant for large-scope network penetration tests where you need to find "interesting" targets from a huge set of web-based hosts. Go ahead and use your favorite screenshotting tool like normal (EyeWitness or GoWitness) and then run them through Eyeballer to tell you what's likely to contain vulnerabilities, and what isn't.
 
-## Installation
+## Setup
 
-To install in a python venv (Recommended):
+Download required packages on pip:
 ```
-python3 -m venv venv
-source venv/bin/activate
-make init
+sudo pip3 install -r requirements.txt
 ```
 
-To install for Conda (automatically creates conda venv):
-
+Or if you want GPU support:
 ```
-make conda
-```
-
-## Running Tests
-
-```
-make test
+sudo pip3 install -r requirements-gpu.txt
 ```
 
 ## Predicting Labels
