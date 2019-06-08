@@ -37,8 +37,9 @@ def train(ctx, graphs, batchsize, epochs):
 @cli.command()
 @click.argument('screenshot')
 @click.option('--heatmap', default=False, is_flag=True, help="Create a heatmap graphfor the prediction")
+@click.option('--threshold', default=.5, type=float, help="Threshold confidence for labeling")
 @click.pass_context
-def predict(ctx, screenshot, heatmap):
+def predict(ctx, screenshot, heatmap, threshold):
     model = EyeballModel(**ctx.obj['model_kwargs'])
     results = model.predict(screenshot)
 
@@ -58,48 +59,50 @@ def predict(ctx, screenshot, heatmap):
             labelwriter.writerows(results)
         
 
-        print("###############################\n##########################")
-        #print(results)
-        print("###############################\n##########################")
         print("Output written to results.csv")
 
-        buildHTML(processDC(results))
-        print("HTML is created in Results.html")
+        buildHTML(processResults(results, threshold))
+        print("HTML is created in results.html")
 
 
-#NEW ---
+def processResults(results, threshold):
+    '''Filter the initial results dictionary according to threshold and reformat it for use in buildHTML.
+
+        Keyword arguments:
+        results -- dictionary output from predict function
+        threshold -- argument that specifies minimum acceptabe level of confidence (Ex. eyeballer ... --threshold 0.5) 
+
+    '''
+    procesedResults = []
+
+    for result in results:
+        positive_label = ''
+        pic_info = {}
+
+        for screenshot_label, label in result.items():
+
+            if screenshot_label == 'filename':
+                pic_info['filename'] = label
+                pic_info['tags'] = ''
+
+            elif label > threshold:
+                positive_label += (str(screenshot_label) + ' ') 
+
+        pic_info['tags'] += positive_label
+        procesedResults.append(pic_info)
+
+    return procesedResults
 
 
+def buildHTML(results):
+    '''Build HTML by iterating through filtered dictionary and save it under specified name.
 
-def processDC(dc):
-    goodDC=[]
-    for item in dc:
-        a_b=''
-        tmp_list={}
-        for key, attr in item.items():
-            #print(key,attr)
-          
-            if key=='filename':
-                tmp_list['filename']=attr
-
-                tmp_list['tags']=''
-            elif attr > 0.5:
-                a_b+=(str(key)+' ') 
-                #print("Adding " + a_b)
-        tmp_list['tags']+=a_b
-        #print(tmp_list)
-        goodDC.append(tmp_list)
-        #print(goodDC)
+        Keyword arguments:
+        results -- dictionary output from processResults function
         
-        
-    return goodDC
-
-
-def buildHTML(dc):
-
+    '''
     html_main = '''
     <link rel="stylesheet" type="text/css" href="html_support/style.css">
-
     <div id="btnsCont">
       <button class="btn all" onclick="filterSelection('all')"> Show all</button>
       <button class="btn" onclick="filterSelection('404')"> 404</button>
@@ -110,22 +113,16 @@ def buildHTML(dc):
     <div class="container">
     '''
     
-    for pic_info in dc:
-        html_main+=('<div class="filterDiv ' + str(pic_info['tags']) + 'show"><a href=' + str(pic_info['filename'])  + '>'+ str(pic_info['tags']).upper() + '</a><img class="res_pic" src="' + str(pic_info['filename']) + '"></div>\n')
+    for pic_info in results:
+        html_main += ('<div class="filterDiv ' + pic_info['tags'] + 'show"><a href=' + pic_info['filename']  + '>'+ pic_info['tags'].upper() + '</a><img class="res_pic" src="' + pic_info['filename'] + '"></div>\n')
 
-    html_main +='''
+    html_main += '''
     </div>
     <script src="html_support/javasc.js"></script>
-
     '''
     
-    with open('Results.html', 'w') as file:
+    with open('results.html', 'w') as file:
         file.write(html_main)
-
-    #print(html_main)
-
-
-#NEW ---
 
 
 def pretty_print_evaluation(results):
