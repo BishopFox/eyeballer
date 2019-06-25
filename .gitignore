@@ -113,5 +113,6 @@ venv.bak/
 *.model
 *.csv
 *.txt
+results.html
 !requirements.txt
 !requirements-gpu.txt

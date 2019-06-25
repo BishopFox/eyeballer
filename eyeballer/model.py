@@ -289,6 +289,7 @@ class EyeballModel:
             steps=len(evaluation_generator))
 
         self._save_prediction_histograms(predictions)
+        print("predictions: ", type(predictions))
         predictions = predictions > threshold
         ground_truth = self.evaluation_labels[DATA_LABELS].to_numpy()
         filenames = self.evaluation_labels[["filename"]].to_numpy()
