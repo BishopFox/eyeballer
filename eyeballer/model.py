@@ -235,7 +235,7 @@ class EyeballModel:
         results = []
         for filename, prediction in zip(prediction_generator.filenames, predictions):
             result = dict()
-            result["filename"] = filename
+            result["filename"] = path + filename
             result["custom404"] = prediction[0]
             result["login"] = prediction[1]
             result["homepage"] = prediction[2]
