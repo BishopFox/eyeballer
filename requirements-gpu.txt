@@ -7,3 +7,5 @@ pillow
 sklearn
 tensorflow-gpu
 keras
+jinja2
+progressbar2
