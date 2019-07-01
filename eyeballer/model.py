@@ -11,17 +11,9 @@ import matplotlib.pyplot as plt
 import numpy as np
 import pandas as pd
 import Augmentor
+import tensorflow as tf
 
-from keras import regularizers
-from keras.applications import MobileNet
-from keras.applications.mobilenet import preprocess_input
-from keras.callbacks import ModelCheckpoint
-from keras.layers import Dropout, Dense
-from keras.layers import GlobalAveragePooling2D
-from keras.models import Model
-from keras.optimizers import Adam
-from keras.preprocessing.image import ImageDataGenerator
-from keras.preprocessing import image
+from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
 from sklearn.metrics import classification_report, accuracy_score, hamming_loss
 from eyeballer.augmentation import EyeballerAugmentation
 
@@ -47,22 +39,23 @@ class EyeballModel:
         weights_file -- A filename for where to load the model's weights.
         seed -- PRNG seed, useful for repeating a previous run and using the same data. Training/Validation split is determined randomly.
         """
-        # Build the model
-        base_model = MobileNet(weights='imagenet', include_top=False, input_shape=self.input_shape)
-        x = base_model.output
-        x = GlobalAveragePooling2D()(x)
-        x = Dense(256, activation="relu", name="HiddenLayer1")(x)
-        x = Dropout(0.5)(x)
-        x = Dense(128, activation="relu", name="HiddenLayer2", kernel_regularizer=regularizers.l2(0.01))(x)
-        x = Dropout(0.2)(x)
-        output_layer = Dense(len(DATA_LABELS), activation="sigmoid", name="OutputLayer")(x)
-        self.model = Model(inputs=base_model.input, outputs=output_layer)
+        # # Build the model
+        self.model = tf.keras.Sequential()
+        pretrained_layer = tf.keras.applications.mobilenet_v2.MobileNetV2(weights='imagenet', include_top=False, input_shape=self.input_shape)
+        self.model.add(pretrained_layer)
+        self.model.add(tf.keras.layers.GlobalAveragePooling2D())
+        self.model.add(tf.keras.layers.Dense(256, activation="relu"))
+        self.model.add(tf.keras.layers.Dropout(0.5))
+        self.model.add(tf.keras.layers.Dense(128, activation="relu"))
+        self.model.add(tf.keras.layers.Dropout(0.2))
+        self.model.add(tf.keras.layers.Dense(len(DATA_LABELS), activation="sigmoid"))
 
-        # for layer in base_model.layers:
-        #     layer.trainable = False
+        self.model.compile(optimizer=tf.keras.optimizers.Adam(0.0005),
+                           loss="binary_crossentropy",
+                           metrics=["accuracy"])
 
-        adam = Adam(lr=0.0005)
-        self.model.compile(optimizer=adam, loss="binary_crossentropy", metrics=["accuracy"])
+        for layer in pretrained_layer.layers:
+            layer.trainable = False
 
         if print_summary:
             print(self.model.summary())
@@ -119,7 +112,7 @@ class EyeballModel:
         """
         print("Training with seed: " + str(self.seed))
 
-        data_generator = ImageDataGenerator(
+        data_generator = tf.keras.preprocessing.image.ImageDataGenerator(
             preprocessing_function=self.preprocess_training_function,
             validation_split=0.2,
             samplewise_center=True)
@@ -148,8 +141,8 @@ class EyeballModel:
             class_mode="other")
 
         # Model checkpoint - Saves model weights when validation accuracy improves
-        callbacks = [ModelCheckpoint(self.checkpoint_file, monitor='val_loss', verbose=1, save_best_only=True,
-                                     save_weights_only=True, mode='min')]
+        callbacks = [tf.keras.callbacks.ModelCheckpoint(self.checkpoint_file, monitor='val_loss', verbose=1, save_best_only=True,
+                     save_weights_only=True, mode='min')]
 
         history = self.model.fit_generator(
             training_generator,
@@ -223,8 +216,8 @@ class EyeballModel:
             # Load the image into memory
             img = None
             try:
-                img = image.load_img(screenshot, target_size=(self.image_width, self.image_height))
-                img = image.img_to_array(img)
+                img = tf.keras.preprocessing.image.load_img(screenshot, target_size=(self.image_width, self.image_height))
+                img = tf.keras.preprocessing.image.img_to_array(img)
                 img = np.expand_dims(img, axis=0)
                 img = preprocess_input(img)
             except IsADirectoryError:
@@ -248,7 +241,7 @@ class EyeballModel:
         threshold -- Value between 0->1. The cutoff where the numerical prediction becomes boolean. Default: 0.5
         """
         # Prepare the data
-        data_generator = ImageDataGenerator(
+        data_generator = tf.keras.preprocessing.image.ImageDataGenerator(
             preprocessing_function=preprocess_input)
         evaluation_generator = data_generator.flow_from_dataframe(
             self.evaluation_labels,
@@ -263,7 +256,7 @@ class EyeballModel:
         if not self.random_seed:
             print("Using validation set...")
             # Data augmentation
-            data_generator = ImageDataGenerator(
+            data_generator = tf.keras.preprocessing.image.ImageDataGenerator(
                 preprocessing_function=self.preprocess_training_function,
                 samplewise_center=True,
                 validation_split=0.2)

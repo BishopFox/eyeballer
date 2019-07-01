@@ -5,7 +5,6 @@ numpy
 pandas
 pillow
 sklearn
-tensorflow
-keras
+tensorflow==2.0.0-beta0
 jinja2
 progressbar2
