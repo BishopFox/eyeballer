@@ -13,7 +13,7 @@ import pandas as pd
 import Augmentor
 import tensorflow as tf
 
-from tensorflow.keras.applications.mobilenet_v2 import preprocess_input
+from tensorflow.keras.applications.mobilenet import preprocess_input
 from sklearn.metrics import classification_report, accuracy_score, hamming_loss
 from eyeballer.augmentation import EyeballerAugmentation
 
@@ -41,7 +41,7 @@ class EyeballModel:
         """
         # # Build the model
         self.model = tf.keras.Sequential()
-        pretrained_layer = tf.keras.applications.mobilenet_v2.MobileNetV2(weights='imagenet', include_top=False, input_shape=self.input_shape)
+        pretrained_layer = tf.keras.applications.mobilenet.MobileNet(weights='imagenet', include_top=False, input_shape=self.input_shape)
         self.model.add(pretrained_layer)
         self.model.add(tf.keras.layers.GlobalAveragePooling2D())
         self.model.add(tf.keras.layers.Dense(256, activation="relu"))
@@ -141,8 +141,12 @@ class EyeballModel:
             class_mode="other")
 
         # Model checkpoint - Saves model weights when validation accuracy improves
-        callbacks = [tf.keras.callbacks.ModelCheckpoint(self.checkpoint_file, monitor='val_loss', verbose=1, save_best_only=True,
-                     save_weights_only=True, mode='min')]
+        callbacks = [tf.keras.callbacks.ModelCheckpoint(self.checkpoint_file,
+                     monitor='val_loss',
+                     verbose=1,
+                     save_best_only=True,
+                     save_weights_only=True,
+                     mode='min')]
 
         history = self.model.fit_generator(
             training_generator,
