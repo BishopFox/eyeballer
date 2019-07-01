@@ -54,8 +54,8 @@ class EyeballModel:
                            loss="binary_crossentropy",
                            metrics=["accuracy"])
 
-        for layer in pretrained_layer.layers:
-            layer.trainable = False
+        # for layer in pretrained_layer.layers:
+        #     layer.trainable = False
 
         if print_summary:
             print(self.model.summary())
