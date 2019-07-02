@@ -27,7 +27,7 @@ class EyeballModel:
     """
     graphs_directory = "graphs/"
     checkpoint_file = "weights.h5"
-    image_dir = "images_224x224/"
+    image_dir = "images/"
     image_width, image_height = 224, 224
     input_shape = (image_width, image_height, 3)
 
