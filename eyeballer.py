@@ -46,7 +46,7 @@ def predict(ctx, screenshot, heatmap, threshold):
 
     if heatmap:
         # Generate a heatmap
-        HeatMap(screenshot, model).generate()
+        HeatMap(screenshot, model, threshold).generate()
 
     if not results:
         print("Error: Input file does not exist")
@@ -60,11 +60,11 @@ def predict(ctx, screenshot, heatmap, threshold):
             labelwriter.writerows(results)
 
         print("Output written to results.csv")
-        buildHTML(processResults(results))
+        buildHTML(processResults(results, threshold))
         print("HTML written to results.html")
 
 
-def processResults(results):
+def processResults(results, threshold):
     '''Filter the initial results dictionary and reformat it for use in JS.
 
         Keyword arguments:
@@ -79,8 +79,7 @@ def processResults(results):
         for label, label_info in result.items():
             if (label == 'filename'):
                 pass
-
-            elif label_info:
+            elif label_info > threshold:
                 positiveTags.append(label)
 
         jsResults[result['filename']] = positiveTags

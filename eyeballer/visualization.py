@@ -7,7 +7,7 @@ from eyeballer.model import DATA_LABELS
 
 
 class HeatMap():
-    def __init__(self, screenshot_path, model, boxsize=28, step=7):
+    def __init__(self, screenshot_path, model, threshold=0.5, boxsize=28, step=7):
         self.model = model
 
         img = image.load_img(screenshot_path, target_size=(self.model.image_width, self.model.image_height))
@@ -20,6 +20,7 @@ class HeatMap():
         self.y = 0
         self.screenshot_path = screenshot_path
         self.gamma = 3
+        self.threshold = threshold
 
     def generate(self, output_file="heatmap.png"):
         """ Make a single heatmap image and return it """
@@ -30,11 +31,11 @@ class HeatMap():
         for label in DATA_LABELS:
             boxsize = self.boxsize
             # Ignore this label if it didn't predict positively (true label)
-            if results[label] > 0.5:
+            if results[label] > self.threshold:
                 worst_score = 1
-                while worst_score > 0.5:
+                while worst_score > self.threshold:
                     heatmap, worst_score = self._get_heatmap(label, boxsize)
-                    if worst_score > 0.5:
+                    if worst_score > self.threshold:
                         boxsize += 28
                         print("Didn't get a good image for {}. Trying again with a bigger boxsize: {}".format(label, boxsize))
                     else:
