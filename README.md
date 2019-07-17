@@ -19,19 +19,19 @@ sudo pip3 install -r requirements-gpu.txt
 To eyeball some screenshots, just run the "predict" mode:
 
 ```
-eyeballer --weights YOUR_WEIGHTS.h5 predict YOUR_FILE.png
+eyeballer.py --weights YOUR_WEIGHTS.h5 predict YOUR_FILE.png
 ```
 
 Or for a whole directory of files:
 
 ```
-eyeballer --weights YOUR_WEIGHTS.h5 predict PATH_TO/YOUR_FILES/
+eyeballer.py --weights YOUR_WEIGHTS.h5 predict PATH_TO/YOUR_FILES/
 ```
 
 ## Training
 To train a new model, run:
 ```
-eyeballer train
+eyeballer.py train
 ```
 
 You'll want a machine with a good GPU for this to run in a reasonable amount of time. Setting that up is outside the scope of this readme, however.
@@ -43,5 +43,5 @@ This will output a new model file (weights.h5 by default).
 You just trained a new model, cool! Let's see how well it performs against some images it's never seen before, across a variety of metrics:
 
 ```
-eyeballer --weights YOUR_WEIGHTS.h5 evaluate
+eyeballer.py --weights YOUR_WEIGHTS.h5 evaluate
 ```
