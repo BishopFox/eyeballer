@@ -1,15 +1,22 @@
 import errno
 import os
 import unittest
+import sys
 
 from eyeballer.model import EyeballModel
 
 
 class PredictTest(unittest.TestCase):
     def setUp(self):
-        weights_file = "latest_weights.h5"
+
+        class DummyFile(object):
+            def write(self, x): pass
+            def flush(self): pass
+
+        sys.stdout = DummyFile()
+        weights_file = "tests/models/test_weights.h5"
         if not os.path.isfile(weights_file):
-            print("Error: Symlink the latest weights file to 'latest_weights.h5'")
+            print("Error: Symlink the latest weights file to " + weights_file)
             raise FileNotFoundError(
                 errno.ENOENT,
                 os.strerror(errno.ENOENT),
@@ -30,7 +37,7 @@ class PredictTest(unittest.TestCase):
         }
         same_seed_model = EyeballModel(**model_kwargs)
 
-        screenshot = "tests/data/test.png"
+        screenshot = "tests/data/404.png"
 
         results_one = self.model.predict(screenshot)
         results_two = same_seed_model.predict(screenshot)
@@ -45,40 +52,72 @@ class PredictTest(unittest.TestCase):
         }
         same_seed_model = EyeballModel(**model_kwargs)
 
-        screenshot = "tests/data/test.png"
+        screenshot = "tests/data/404.png"
 
         results_one = same_seed_model.predict(screenshot)
         results_two = same_seed_model.predict(screenshot)
 
-        self.assertEquals(results_one, results_two)
-
-    def get_prediction_by_name(self, results):
-        prediction = None
-        max_val = 0.0
-
-        print(results)
-        for k, v in results[0].items():
-            if not isinstance(v, str) and v > max_val:
-                prediction = k
-                max_val = v
-        return prediction
+        self.assertEqual(results_one, results_two)
 
     def test_predict_custom404(self):
-        screenshot = "tests/data/custom404.png"
-        results = self.model.predict(screenshot)
-        self.assertEqual(self.get_prediction_by_name(results), "custom404")
+        screenshot = "tests/data/404.png"
+        results = self.model.predict(screenshot)[0]
+        self.assertGreater(results["custom404"], 0.5)
+
+    def test_predict_not_custom404(self):
+        screenshot = "tests/data/nothing.png"
+        results = self.model.predict(screenshot)[0]
+        self.assertLess(results["custom404"], 0.5)
 
     def test_predict_login(self):
         screenshot = "tests/data/login.png"
-        results = self.model.predict(screenshot)
-        self.assertEqual(self.get_prediction_by_name(results), "login")
+        results = self.model.predict(screenshot)[0]
+        self.assertGreater(results["login"], 0.5)
+
+    def test_predict_not_login(self):
+        screenshot = "tests/data/nothing.png"
+        results = self.model.predict(screenshot)[0]
+        print(screenshot, results)
+        self.assertLess(results["login"], 0.5)
 
     def test_predict_homepage(self):
         screenshot = "tests/data/homepage.png"
-        results = self.model.predict(screenshot)
-        self.assertEqual(self.get_prediction_by_name(results), "homepage")
+        results = self.model.predict(screenshot)[0]
+        self.assertGreater(results["homepage"], 0.5)
+
+    def test_predict_not_homepage(self):
+        screenshot = "tests/data/nothing.png"
+        results = self.model.predict(screenshot)[0]
+        self.assertLess(results["homepage"], 0.5)
 
     def test_predict_oldlooking(self):
-        screenshot = "tests/data/oldlooking.png"
-        results = self.model.predict(screenshot)
-        self.assertEqual(self.get_prediction_by_name(results), "oldlooking")
+        screenshot = "tests/data/old-looking.png"
+        results = self.model.predict(screenshot)[0]
+        self.assertGreater(results["oldlooking"], 0.5)
+
+    def test_predict_not_oldlooking(self):
+        screenshot = "tests/data/nothing.png"
+        results = self.model.predict(screenshot)[0]
+        self.assertLess(results["oldlooking"], 0.5)
+
+    def test_file_doesnt_exist(self):
+        screenshot = "tests/data/doesnotexist.png"
+        try:
+            self.model.predict(screenshot)[0]
+            self.fail("FileNotFoundError was expected but not found")
+        except FileNotFoundError:
+            pass
+
+    def test_file_is_empty(self):
+        """
+        We're just testing that it doesn't crash, basically
+        """
+        screenshot = "tests/data/empty.png"
+        self.model.predict(screenshot)
+
+    def test_file_is_invalid(self):
+        """
+        We're just testing that it doesn't crash, basically
+        """
+        screenshot = "tests/data/invalid.png"
+        self.model.predict(screenshot)

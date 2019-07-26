@@ -227,6 +227,9 @@ class EyeballModel:
             except IsADirectoryError:
                 print("\nWARN: Skipping directory: ", screenshot)
                 continue
+            except OSError:
+                print("\nWARN: Skipping empty or corrupt file: ", screenshot)
+                continue
 
             prediction = self.model.predict(img, batch_size=1)
             result = dict()
