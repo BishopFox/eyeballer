@@ -108,6 +108,11 @@ class PredictTest(unittest.TestCase):
         except FileNotFoundError:
             pass
 
+    def test_folder(self):
+        screenshots = "tests/data/"
+        results = self.model.predict(screenshots)
+        self.assertEqual(len(results), 7)
+
     def test_file_is_empty(self):
         """
         We're just testing that it doesn't crash, basically
