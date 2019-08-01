@@ -216,7 +216,8 @@ class EyeballModel:
             raise FileNotFoundError
 
         results = []
-        for screenshot in progressbar.progressbar(screenshots):
+        pbar = progressbar.ProgressBar()
+        for screenshot in pbar(screenshots):
             # Load the image into memory
             img = None
             try:
