@@ -31,7 +31,7 @@ class EyeballModel:
     image_width, image_height = 224, 224
     input_shape = (image_width, image_height, 3)
 
-    def __init__(self, weights_file, print_summary=False, seed=None):
+    def __init__(self, weights_file, print_summary=False, seed=None, quiet=False):
         """Constructor for model class.
 
         Keyword arguments:
@@ -59,6 +59,8 @@ class EyeballModel:
 
         if print_summary:
             print(self.model.summary())
+
+        self.quiet = quiet
 
         # Pull out our labels for use in generators later
         data = pd.read_csv("labels.csv")
@@ -216,7 +218,10 @@ class EyeballModel:
             raise FileNotFoundError
 
         results = []
-        for screenshot in progressbar.progressbar(screenshots):
+        bar = progressbar.ProgressBar()
+        if self.quiet:
+            bar = progressbar.NullBar()
+        for screenshot in bar(screenshots):
             # Load the image into memory
             img = None
             try:

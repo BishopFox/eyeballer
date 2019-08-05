@@ -25,7 +25,8 @@ class PredictTest(unittest.TestCase):
         model_kwargs = {
             "weights_file": weights_file,
             "print_summary": False,
-            "seed": None
+            "seed": None,
+            "quiet": True
         }
         self.model = EyeballModel(**model_kwargs)
 
@@ -33,7 +34,8 @@ class PredictTest(unittest.TestCase):
         model_kwargs = {
             "weights_file": None,
             "print_summary": False,
-            "seed": 12345678
+            "seed": 12345678,
+            "quiet": True
         }
         same_seed_model = EyeballModel(**model_kwargs)
 
@@ -48,7 +50,8 @@ class PredictTest(unittest.TestCase):
         model_kwargs = {
             "weights_file": None,
             "print_summary": False,
-            "seed": 12345678
+            "seed": 12345678,
+            "quiet": True
         }
         same_seed_model = EyeballModel(**model_kwargs)
 
