@@ -5,6 +5,8 @@ Eyeballer is meant for large-scope network penetration tests where you need to f
 
 ## Setup
 
+Eyeballer uses TF.keras on Tensorflow 2.0. This is (as of this moment) still in "beta". So the pip requirement for it looks a bit weird. It'll also probably conflict with an existing TensorFlow installation if you've got the regular 1.0 version installed. So, heads-up there. But 2.0 should be out of beta and official "soon" according to Google, so this problem ought to solve itself in short order.
+
 Download required packages on pip:
 ```
 sudo pip3 install -r requirements.txt
@@ -14,6 +16,19 @@ Or if you want GPU support:
 ```
 sudo pip3 install -r requirements-gpu.txt
 ```
+
+**NOTE**: Setting up a GPU for use with TensorFlow is way beyond the scope of this README. There's hardware compatibility to consider, drivers to install... There's a lot. So you're just going to have to figure this part out on your own if you want a GPU. But at least from a Python package perspective, the above requirements file has you covered.
+
+**Training Data** You can find our training data here:
+
+https://www.dropbox.com/sh/7aouywaid7xptpq/AAD_-I4hAHrDeiosDAQksnBma?dl=1
+
+Pretty soon, we're going to add this as a TensorFlow DataSet, so you don't need to download this separately like this. It'll also let us version the data a bit better. But for now, just deal with it. There's two things you need from the training data:
+
+1. `images/` folder, containing all the screenshots
+2. `labels.csv` that has all the labels
+
+Copy both into the root of the Eyeballer code tree.
 
 ## Predicting Labels
 To eyeball some screenshots, just run the "predict" mode:
@@ -27,6 +42,9 @@ Or for a whole directory of files:
 ```
 eyeballer.py --weights YOUR_WEIGHTS.h5 predict PATH_TO/YOUR_FILES/
 ```
+
+Eyeballer will spit the results back to you in human readable format (a `results.html` file so you can browse it easily) and machine readable format (a `results.csv` file).
+
 
 ## Training
 To train a new model, run:
@@ -45,3 +63,5 @@ You just trained a new model, cool! Let's see how well it performs against some 
 ```
 eyeballer.py --weights YOUR_WEIGHTS.h5 evaluate
 ```
+
+The output will describe the model's accuracy in both recall and precision for each of the program's labels. (Including "none of the above" as a pseudo-label)
