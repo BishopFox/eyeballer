@@ -25,10 +25,11 @@ https://www.dropbox.com/sh/7aouywaid7xptpq/AAD_-I4hAHrDeiosDAQksnBma?dl=1
 
 Pretty soon, we're going to add this as a TensorFlow DataSet, so you don't need to download this separately like this. It'll also let us version the data a bit better. But for now, just deal with it. There's two things you need from the training data:
 
-1. `images/` folder, containing all the screenshots
+1. `images/` folder, containing all the screenshots (resized down to 224x140. We'll have the full-size images up soon)
 2. `labels.csv` that has all the labels
+3. `bishop-fox-pretrained-v1.h5` A pretrained weights file you can use right out of the box without training.
 
-Copy both into the root of the Eyeballer code tree.
+Copy all three into the root of the Eyeballer code tree.
 
 ## Predicting Labels
 To eyeball some screenshots, just run the "predict" mode:
