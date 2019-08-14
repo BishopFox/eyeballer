@@ -1,6 +1,7 @@
 import numpy as np
 import math
-from keras.preprocessing import image
+import tensorflow as tf
+
 from copy import deepcopy
 from matplotlib import pyplot as plt
 from eyeballer.model import DATA_LABELS
@@ -10,8 +11,8 @@ class HeatMap():
     def __init__(self, screenshot_path, model, threshold=0.5, boxsize=28, step=7):
         self.model = model
 
-        img = image.load_img(screenshot_path, target_size=(self.model.image_width, self.model.image_height))
-        img = image.img_to_array(img)
+        img = tf.keras.preprocessing.image.load_img(screenshot_path, target_size=(self.model.image_width, self.model.image_height))
+        img = tf.keras.preprocessing.image.img_to_array(img)
 
         self.screenshot = img
         self.boxsize = boxsize
@@ -43,7 +44,7 @@ class HeatMap():
                         labels.append(label)
 
         plt.figure()
-        screenshot_image = image.load_img(self.screenshot_path, target_size=(self.model.image_width, self.model.image_width))
+        screenshot_image = tf.keras.preprocessing.image.load_img(self.screenshot_path, target_size=(self.model.image_width, self.model.image_width))
         _, subplots = plt.subplots(1, len(heatmaps))
         # This is a little janky, but matplotlib returns a list above if there's multiple subplots, and just a single subplot if there's only one
         #   it would have been easier if it was always a list. But alas
