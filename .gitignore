@@ -118,3 +118,4 @@ results.html
 !requirements-gpu.txt
 !tests/models/*
 !tests/data/*
+!docs/*

@@ -3,6 +3,17 @@ Give those screenshots of yours a quick eyeballing.
 
 Eyeballer is meant for large-scope network penetration tests where you need to find "interesting" targets from a huge set of web-based hosts. Go ahead and use your favorite screenshotting tool like normal (EyeWitness or GoWitness) and then run them through Eyeballer to tell you what's likely to contain vulnerabilities, and what isn't.
 
+
+### Example Labels
+
+| Old-Looking Sites | Login Pages |
+| ------ |:-----:|
+| ![Sample Old-looking Page](/docs/old-looking.png) | ![Sample Login Page](/docs/login.png) |
+
+| Homepages | Custom 404's |
+| ------ |:-----:|
+| ![Sample Homepage](/docs/homepage.png) | ![Sample Custom 404](/docs/404.png) |
+
 ## Setup
 
 Eyeballer uses TF.keras on Tensorflow 2.0. This is (as of this moment) still in "beta". So the pip requirement for it looks a bit weird. It'll also probably conflict with an existing TensorFlow installation if you've got the regular 1.0 version installed. So, heads-up there. But 2.0 should be out of beta and official "soon" according to Google, so this problem ought to solve itself in short order.
