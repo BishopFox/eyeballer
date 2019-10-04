@@ -1,7 +1,8 @@
 Augmentor
 click
 matplotlib
-numpy
+numpy==1.16.4
+keras
 pandas
 pillow
 sklearn
