@@ -4,6 +4,7 @@ import unittest
 import sys
 
 from eyeballer.model import EyeballModel
+from eyeballer.visualization import HeatMap
 
 
 class PredictTest(unittest.TestCase):
@@ -129,3 +130,13 @@ class PredictTest(unittest.TestCase):
         """
         screenshot = "tests/data/invalid.png"
         self.model.predict(screenshot)
+
+    def test_heatmap(self):
+        screenshot = "tests/data/login.png"
+        HeatMap(screenshot, self.model, 0.5)
+
+        screenshot = "tests/data/404.png"
+        HeatMap(screenshot, self.model, 0.5)
+
+        screenshot = "tests/data/empty.png"
+        HeatMap(screenshot, self.model, 0.5)
