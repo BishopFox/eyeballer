@@ -9,12 +9,12 @@ from jinja2 import Template
 
 
 @click.group(invoke_without_command=True)
-@click.option('--weights', default=None, type=click.Path(), help="Weights file for input/output")
+@click.option('--model', default=None, type=click.Path(), help="Model file for input/output")
 @click.option('--summary/--no-summary', default=False, help="Print model summary at start")
 @click.option('--seed', default=None, type=int, help="RNG seed for data shuffling and transformations, defaults to random value")
 @click.pass_context
-def cli(ctx, weights, summary, seed):
-    model_kwargs = {"weights_file": weights,
+def cli(ctx, model, summary, seed):
+    model_kwargs = {"model_file": model,
                     "print_summary": summary,
                     "seed": seed}
 

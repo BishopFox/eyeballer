@@ -46,13 +46,13 @@ Copy all three into the root of the Eyeballer code tree.
 To eyeball some screenshots, just run the "predict" mode:
 
 ```
-eyeballer.py --weights YOUR_WEIGHTS.h5 predict YOUR_FILE.png
+eyeballer.py --model YOUR_MODEL.h5 predict YOUR_FILE.png
 ```
 
 Or for a whole directory of files:
 
 ```
-eyeballer.py --weights YOUR_WEIGHTS.h5 predict PATH_TO/YOUR_FILES/
+eyeballer.py --model YOUR_MODEL.h5 predict PATH_TO/YOUR_FILES/
 ```
 
 Eyeballer will spit the results back to you in human readable format (a `results.html` file so you can browse it easily) and machine readable format (a `results.csv` file).
@@ -66,14 +66,14 @@ eyeballer.py train
 
 You'll want a machine with a good GPU for this to run in a reasonable amount of time. Setting that up is outside the scope of this readme, however.
 
-This will output a new model file (weights.h5 by default).
+This will output a new model file (model.h5 by default).
 
 ## Evaluation
 
 You just trained a new model, cool! Let's see how well it performs against some images it's never seen before, across a variety of metrics:
 
 ```
-eyeballer.py --weights YOUR_WEIGHTS.h5 evaluate
+eyeballer.py --model YOUR_MODEL.h5 evaluate
 ```
 
 The output will describe the model's accuracy in both recall and precision for each of the program's labels. (Including "none of the above" as a pseudo-label)

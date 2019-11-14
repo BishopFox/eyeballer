@@ -15,16 +15,16 @@ class PredictTest(unittest.TestCase):
             def flush(self): pass
 
         sys.stdout = DummyFile()
-        weights_file = "tests/models/test_weights.h5"
-        if not os.path.isfile(weights_file):
-            print("Error: Symlink the latest weights file to " + weights_file)
+        model_file = "tests/models/model_file.h5"
+        if not os.path.isfile(model_file):
+            print("Error: Symlink the latest model file to " + model_file)
             raise FileNotFoundError(
                 errno.ENOENT,
                 os.strerror(errno.ENOENT),
-                weights_file)
+                model_file)
 
         model_kwargs = {
-            "weights_file": weights_file,
+            "model_file": model_file,
             "print_summary": False,
             "seed": None,
             "quiet": True
@@ -33,7 +33,7 @@ class PredictTest(unittest.TestCase):
 
     def test_different_seed_predict(self):
         model_kwargs = {
-            "weights_file": None,
+            "model_file": None,
             "print_summary": False,
             "seed": 12345678,
             "quiet": True
@@ -49,7 +49,7 @@ class PredictTest(unittest.TestCase):
 
     def test_same_seed_predict(self):
         model_kwargs = {
-            "weights_file": None,
+            "model_file": None,
             "print_summary": False,
             "seed": 12345678,
             "quiet": True
