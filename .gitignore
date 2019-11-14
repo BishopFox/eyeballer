@@ -104,9 +104,10 @@ venv.bak/
 .mypy_cache/
 
 #screenshot data
-*.png
-*.jpg
-*.tar
+images*
+
+#Graphs and Results
+graphs/*
 
 #model files
 *.h5
@@ -119,3 +120,6 @@ results.html
 !tests/models/*
 !tests/data/*
 !docs/*
+
+#Leave the webui things alone for their own gitignore
+!webui/*
