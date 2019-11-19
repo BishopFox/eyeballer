@@ -14,11 +14,9 @@ Eyeballer is meant for large-scope network penetration tests where you need to f
 | ------ |:-----:|
 | ![Sample Homepage](/docs/homepage.png) | ![Sample Custom 404](/docs/404.png) |
 
-## WebUI Setup
+## Web UI Setup
 
-Eyeballer's Web UI uses TensorflowJS, TODO
-
-To run the Eyeballer Web UI locally, you'll need Node. On Debian, you can install that with the npm package:
+Eyeballer's Web UI uses TensorflowJS and React. It runs entirely in your browser locally, with no backend functionality whatsoever. So you can "upload" files to classify and get results without the files ever leaving your computer. To run the Eyeballer Web UI locally, you'll need Node. On Debian, you can install that with the npm package:
 
 ```
 sudo apt install npm
@@ -31,7 +29,13 @@ cd webui/
 npm install
 ```
 
-Then you can run the WebUI with:
+Copy a pre-trained model file (in TensorflowJS format) into a jsmodel/ folder under public/, so that it's available in the web server.
+
+```
+cp YOUR_MODEL/ webui/public/
+```
+
+Then you can run the Web UI with:
 
 ```
 npm start
