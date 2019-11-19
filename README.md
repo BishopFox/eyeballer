@@ -14,7 +14,30 @@ Eyeballer is meant for large-scope network penetration tests where you need to f
 | ------ |:-----:|
 | ![Sample Homepage](/docs/homepage.png) | ![Sample Custom 404](/docs/404.png) |
 
-## Setup
+## WebUI Setup
+
+Eyeballer's Web UI uses TensorflowJS, TODO
+
+To run the Eyeballer Web UI locally, you'll need Node. On Debian, you can install that with the npm package:
+
+```
+sudo apt install npm
+```
+
+Then you'll need to install some Node dependencies:
+
+```
+cd webui/
+npm install
+```
+
+Then you can run the WebUI with:
+
+```
+npm start
+```
+
+## Python Setup
 
 Eyeballer uses TF.keras on Tensorflow 2.0. This is (as of this moment) still in "beta". So the pip requirement for it looks a bit weird. It'll also probably conflict with an existing TensorFlow installation if you've got the regular 1.0 version installed. So, heads-up there. But 2.0 should be out of beta and official "soon" according to Google, so this problem ought to solve itself in short order.
 
