@@ -16,8 +16,6 @@ Eyeballer is meant for large-scope network penetration tests where you need to f
 
 ## Setup
 
-Eyeballer uses TF.keras on Tensorflow 2.0. This is (as of this moment) still in "beta". So the pip requirement for it looks a bit weird. It'll also probably conflict with an existing TensorFlow installation if you've got the regular 1.0 version installed. So, heads-up there. But 2.0 should be out of beta and official "soon" according to Google, so this problem ought to solve itself in short order.
-
 Download required packages on pip:
 ```
 sudo pip3 install -r requirements.txt
