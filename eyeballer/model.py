@@ -61,7 +61,10 @@ class EyeballModel:
             print(self.model.summary())
 
         self.quiet = quiet
+        self.seed = seed
+        self.weights_file = weights_file
 
+    def _init_labels(self):
         # Pull out our labels for use in generators later
         data = pd.read_csv("labels.csv")
         self.training_labels = data.loc[data['evaluation'] == False]  # noqa: E712
@@ -69,7 +72,6 @@ class EyeballModel:
 
         # Shuffle the training labels
         self.random_seed = False
-        self.seed = seed
         if self.seed is None:
             self.random_seed = True
             self.seed = random.randint(0, 999999)
@@ -78,15 +80,15 @@ class EyeballModel:
         random.seed(self.seed)
         self.training_labels = self.training_labels.sample(frac=1)
 
-        if weights_file is not None and os.path.isfile(weights_file):
+        if self.weights_file is not None and os.path.isfile(self.weights_file):
             try:
-                self.model.load_weights(weights_file)
+                self.model.load_weights(self.weights_file)
             except OSError:
-                print("ERROR: Unable to open weights file '{}'".foramt(weights_file))
+                print("ERROR: Unable to open weights file '{}'".foramt(self.weights_file))
                 sys.exit(-1)
             print("Loaded model from file.")
         else:
-            if weights_file is not None:
+            if self.weights_file is not None:
                 raise FileNotFoundError
             print("WARN: No model loaded from file. Generating random model")
 
@@ -114,6 +116,7 @@ class EyeballModel:
         """
         print("Training with seed: " + str(self.seed))
 
+        self._init_labels()
         data_generator = tf.keras.preprocessing.image.ImageDataGenerator(
             preprocessing_function=self.preprocess_training_function,
             validation_split=0.2,
@@ -262,6 +265,7 @@ class EyeballModel:
         threshold -- Value between 0->1. The cutoff where the numerical prediction becomes boolean. Default: 0.5
         """
         # Prepare the data
+        self._init_labels()
         data_generator = tf.keras.preprocessing.image.ImageDataGenerator(
             preprocessing_function=preprocess_input)
         evaluation_generator = data_generator.flow_from_dataframe(
