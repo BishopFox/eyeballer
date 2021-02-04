@@ -144,20 +144,20 @@ class EyeballModel:
 
         # Model checkpoint - Saves model weights when validation accuracy improves
         callbacks = [tf.keras.callbacks.ModelCheckpoint(self.checkpoint_file,
-                        monitor='val_loss',
-                        verbose=1,
-                        save_best_only=True,
-                        save_weights_only=True,
-                        mode='min'),
+                                                        monitor='val_loss',
+                                                        verbose=1,
+                                                        save_best_only=True,
+                                                        save_weights_only=True,
+                                                        mode='min'),
                      tf.keras.callbacks.TensorBoard(log_dir='logs',
-                        histogram_freq=2,
-                        write_graph=True,
-                        write_images=False,
-                        update_freq='epoch',
-                        profile_batch=2,
-                        embeddings_freq=0,
-                        embeddings_metadata=None),
-                    ]
+                                                    histogram_freq=2,
+                                                    write_graph=True,
+                                                    write_images=False,
+                                                    update_freq='epoch',
+                                                    profile_batch=2,
+                                                    embeddings_freq=0,
+                                                    embeddings_metadata=None),
+                     ]
 
         history = self.model.fit_generator(
             training_generator,

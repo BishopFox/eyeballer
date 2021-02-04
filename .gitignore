@@ -119,3 +119,4 @@ results.html
 !tests/models/*
 !tests/data/*
 !docs/*
+logs/*
