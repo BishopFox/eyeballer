@@ -162,7 +162,7 @@ class EyeballModel:
                                                     embeddings_metadata=None),
                      ]
 
-        history = self.model.fit_generator(
+        history = self.model.fit(
             training_generator,
             steps_per_epoch=len(training_generator.filenames) // batch_size,
             epochs=epochs,
