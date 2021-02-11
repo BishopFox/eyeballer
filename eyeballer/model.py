@@ -57,12 +57,23 @@ class EyeballModel:
         # for layer in pretrained_layer.layers:
         #     layer.trainable = False
 
+        if weights_file is not None and os.path.isfile(weights_file):
+            try:
+                self.model.load_weights(weights_file)
+            except OSError:
+                print("ERROR: Unable to open weights file '{}'".foramt(weights_file))
+                sys.exit(-1)
+            print("Loaded model from file.")
+        else:
+            if weights_file is not None:
+                raise FileNotFoundError
+            print("WARN: No model loaded from file. Generating random model")
+
         if print_summary:
             print(self.model.summary())
 
         self.quiet = quiet
         self.seed = seed
-        self.weights_file = weights_file
 
     def _init_labels(self):
         # Pull out our labels for use in generators later
@@ -79,18 +90,6 @@ class EyeballModel:
         print("using seed: {}".format(self.seed))
         random.seed(self.seed)
         self.training_labels = self.training_labels.sample(frac=1)
-
-        if self.weights_file is not None and os.path.isfile(self.weights_file):
-            try:
-                self.model.load_weights(self.weights_file)
-            except OSError:
-                print("ERROR: Unable to open weights file '{}'".foramt(self.weights_file))
-                sys.exit(-1)
-            print("Loaded model from file.")
-        else:
-            if self.weights_file is not None:
-                raise FileNotFoundError
-            print("WARN: No model loaded from file. Generating random model")
 
         # Data augmentation
         augmentor = Augmentor.Pipeline()
@@ -132,7 +131,7 @@ class EyeballModel:
             subset='training',
             shuffle=True,
             seed=self.seed,
-            class_mode="other")
+            class_mode="raw")
         validation_generator = data_generator.flow_from_dataframe(
             self.training_labels,
             directory=self.image_dir,
@@ -143,7 +142,7 @@ class EyeballModel:
             subset='validation',
             shuffle=False,
             seed=self.seed,
-            class_mode="other")
+            class_mode="raw")
 
         # Model checkpoint - Saves model weights when validation accuracy improves
         callbacks = [tf.keras.callbacks.ModelCheckpoint(self.checkpoint_file,
@@ -276,7 +275,7 @@ class EyeballModel:
             target_size=(self.image_width, self.image_height),
             shuffle=False,
             batch_size=1,
-            class_mode="other")
+            class_mode="raw")
         # If a seed was selected, then also evaluate on the validation set for that seed
         if not self.random_seed:
             print("Using validation set...")
@@ -295,11 +294,11 @@ class EyeballModel:
                 subset='validation',
                 shuffle=False,
                 seed=self.seed,
-                class_mode="other")
+                class_mode="raw")
         else:
             print("Using evaluation set...")
 
-        predictions = self.model.predict_generator(
+        predictions = self.model.predict(
             evaluation_generator,
             verbose=1,
             steps=len(evaluation_generator))
