@@ -54,9 +54,6 @@ class EyeballModel:
                            loss="binary_crossentropy",
                            metrics=["accuracy"])
 
-        # for layer in pretrained_layer.layers:
-        #     layer.trainable = False
-
         if weights_file is not None and os.path.isfile(weights_file):
             try:
                 self.model.load_weights(weights_file)
