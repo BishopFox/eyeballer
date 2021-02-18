@@ -17,7 +17,7 @@ from tensorflow.keras.applications.mobilenet import preprocess_input
 from sklearn.metrics import classification_report, accuracy_score, hamming_loss
 from eyeballer.augmentation import EyeballerAugmentation
 
-DATA_LABELS = ["custom404", "login", "homepage", "oldlooking"]
+DATA_LABELS = ["custom404", "login", "webapp", "oldlooking"]
 
 
 class EyeballModel:
@@ -205,7 +205,7 @@ class EyeballModel:
         result["filename"] = "custom-image"
         result["custom404"] = prediction[0][0]
         result["login"] = prediction[0][1]
-        result["homepage"] = prediction[0][2]
+        result["webapp"] = prediction[0][2]
         result["oldlooking"] = prediction[0][3]
         return result
 
@@ -249,7 +249,7 @@ class EyeballModel:
             result["filename"] = screenshot
             result["custom404"] = prediction[0][0]
             result["login"] = prediction[0][1]
-            result["homepage"] = prediction[0][2]
+            result["webapp"] = prediction[0][2]
             result["oldlooking"] = prediction[0][3]
             results.append(result)
         return results
