@@ -1,4 +1,7 @@
-# Eyeballer ![Logo](/docs/eyeballer_logo.png)
+# Eyeballer
+
+![Logo](/docs/eyeballer_logo.png)
+
 
 Give those screenshots of yours a quick eyeballing.
 
