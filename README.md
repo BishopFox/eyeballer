@@ -44,7 +44,7 @@ sudo pip3 install -r requirements-gpu.txt
 
 **Training Data** You can find our training data here:
 
-https://www.dropbox.com/sh/7aouywaid7xptpq/AAD_-I4hAHrDeiosDAQksnBma?dl=1
+https://www.dropbox.com/sh/usd03z9s0vnhzxu/AADyJvWgzlL1w4WnaAuxQbQQa?dl=1
 
 Pretty soon, we're going to add this as a TensorFlow DataSet, so you don't need to download this separately like this. It'll also let us version the data a bit better. But for now, just deal with it. There's two things you need from the training data:
 
