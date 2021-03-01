@@ -54,7 +54,7 @@ Pretty soon, we're going to add this as a TensorFlow DataSet, so you don't need 
 
 1. `images/` folder, containing all the screenshots (resized down to 224x140. We'll have the full-size images up soon)
 2. `labels.csv` that has all the labels
-3. `bishop-fox-pretrained-v1.h5` A pretrained weights file you can use right out of the box without training.
+3. `bishop-fox-pretrained-v2.h5` A pretrained weights file you can use right out of the box without training.
 
 Copy all three into the root of the Eyeballer code tree.
 
