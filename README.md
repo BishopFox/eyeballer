@@ -14,9 +14,9 @@ Eyeballer is meant for large-scope network penetration tests where you need to f
 | ------ |:-----:|
 | ![Sample Old-looking Page](/docs/old-looking.png) | ![Sample Login Page](/docs/login.png) |
 
-| Homepages | Custom 404's |
+| Webapp | Custom 404's |
 | ------ |:-----:|
-| ![Sample Homepage](/docs/homepage.png) | ![Sample Custom 404](/docs/404.png) |
+| ![Sample Webapp](/docs/homepage.png) | ![Sample Custom 404](/docs/404.png) |
 
 ## What the Labels Mean
 
@@ -26,8 +26,8 @@ Blocky frames, broken CSS, that certain "je ne sais quoi" of a website that look
 **Login Pages**
 Login pages are valuable to pen testing, they indicate that there's additional functionality you don't currently have access to. It also means there's a simple follow-up process of credential enumeration attacks. You might think that you can set a simple heuristic to find login pages, but in practice it's really hard. Modern sites don't just use a simple input tag we can grep for.
 
-**Homepages**
-A "Homepage" is the landing page to a larger application. This tells you that there is a larger group of pages and functionality available here that can serve as surface area to attack. This is in contrast to a simple login page, with no other functionality. Or a default IIS landing page which has no other functionality. A "Homepage" should indicate to you that there is a web application here to attack.
+**Webapp**
+This tells you that there is a larger group of pages and functionality available here that can serve as surface area to attack. This is in contrast to a simple login page, with no other functionality. Or a default IIS landing page which has no other functionality. This label should indicate to you that there is a web application here to attack.
 
 **Custom 404**
 Modern sites love to have cutesy custom 404 pages with pictures of broken robots or sad looking dogs. Unfortunately, they also love to return HTTP 200 response codes while they do it. More often, the "404" page doesn't even contain the text "404" in it. These pages are typically uninteresting, despite having a lot going on visually, and Eyeballer can help you sift them out.
@@ -48,7 +48,7 @@ sudo pip3 install -r requirements-gpu.txt
 
 **Training Data** You can find our training data here:
 
-https://www.dropbox.com/sh/7aouywaid7xptpq/AAD_-I4hAHrDeiosDAQksnBma?dl=1
+https://www.dropbox.com/sh/usd03z9s0vnhzxu/AADyJvWgzlL1w4WnaAuxQbQQa?dl=1
 
 Pretty soon, we're going to add this as a TensorFlow DataSet, so you don't need to download this separately like this. It'll also let us version the data a bit better. But for now, just deal with it. There's two things you need from the training data:
 

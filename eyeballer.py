@@ -54,7 +54,7 @@ def predict(ctx, screenshot, heatmap, threshold):
         print(results)
     else:
         with open("results.csv", "w", newline="") as csvfile:
-            fieldnames = ["filename", "custom404", "login", "homepage", "oldlooking"]
+            fieldnames = ["filename", "custom404", "login", "webapp", "oldlooking"]
             labelwriter = csv.DictWriter(csvfile, fieldnames=fieldnames)
             labelwriter.writeheader()
             labelwriter.writerows(results)
