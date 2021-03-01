@@ -46,6 +46,10 @@ sudo pip3 install -r requirements-gpu.txt
 
 **NOTE**: Setting up a GPU for use with TensorFlow is way beyond the scope of this README. There's hardware compatibility to consider, drivers to install... There's a lot. So you're just going to have to figure this part out on your own if you want a GPU. But at least from a Python package perspective, the above requirements file has you covered.
 
+**Pretrained Weights**
+
+For the latest pretrained weights, check out the releases.
+
 **Training Data** You can find our training data here:
 
 https://www.dropbox.com/sh/usd03z9s0vnhzxu/AADyJvWgzlL1w4WnaAuxQbQQa?dl=1
