@@ -17,7 +17,7 @@ from tensorflow.keras.applications.mobilenet import preprocess_input
 from sklearn.metrics import classification_report, accuracy_score, hamming_loss
 from eyeballer.augmentation import EyeballerAugmentation
 
-DATA_LABELS = ["custom404", "login", "webapp", "oldlooking"]
+DATA_LABELS = ["custom404", "login", "webapp", "oldlooking", "parked"]
 
 
 class EyeballModel:
@@ -207,6 +207,7 @@ class EyeballModel:
         result["login"] = prediction[0][1]
         result["webapp"] = prediction[0][2]
         result["oldlooking"] = prediction[0][3]
+        result["parked"] = prediction[0][4]
         return result
 
     def predict(self, path, threshold=0.5):
@@ -251,6 +252,7 @@ class EyeballModel:
             result["login"] = prediction[0][1]
             result["webapp"] = prediction[0][2]
             result["oldlooking"] = prediction[0][3]
+            result["parked"] = prediction[0][4]
             results.append(result)
         return results
 
