@@ -18,6 +18,10 @@ Eyeballer is meant for large-scope network penetration tests where you need to f
 | ------ |:-----:|
 | ![Sample Webapp](/docs/homepage.png) | ![Sample Custom 404](/docs/404.png) |
 
+| Parked Domains |
+| ------ |
+| ![Sample Webapp](/docs/parked.png) |
+
 ## What the Labels Mean
 
 **Old-Looking Sites**
@@ -31,6 +35,9 @@ This tells you that there is a larger group of pages and functionality available
 
 **Custom 404**
 Modern sites love to have cutesy custom 404 pages with pictures of broken robots or sad looking dogs. Unfortunately, they also love to return HTTP 200 response codes while they do it. More often, the "404" page doesn't even contain the text "404" in it. These pages are typically uninteresting, despite having a lot going on visually, and Eyeballer can help you sift them out.
+
+**Parked Domains**
+Parked domains are websites that look real, but aren't valid attack surface. They're stand-in pages, usually devoid of any real functionality, consist almost entirely of ads, and are usually not run by our actual target. It's what you get when the domain specified is wrong or lapsed. Finding these pages and removing them from scope is really valuable over time.
 
 ## Setup
 
@@ -54,15 +61,18 @@ For the latest pretrained weights, check out the releases.
 
 https://www.dropbox.com/sh/usd03z9s0vnhzxu/AADyJvWgzlL1w4WnaAuxQbQQa?dl=1
 
-Pretty soon, we're going to add this as a TensorFlow DataSet, so you don't need to download this separately like this. It'll also let us version the data a bit better. But for now, just deal with it. There's two things you need from the training data:
+There's two things you need from the training data:
 
-1. `images/` folder, containing all the screenshots (resized down to 224x140. We'll have the full-size images up soon)
+1. `images/` folder, containing all the screenshots (resized down to 224x224)
 2. `labels.csv` that has all the labels
 3. `bishop-fox-pretrained-v2.h5` A pretrained weights file you can use right out of the box without training.
 
 Copy all three into the root of the Eyeballer code tree.
 
 ## Predicting Labels
+
+NOTE: For best results, make sure you screenshot your websites in a native 1.6x aspect ratio. IE: 1440x900. Eyeballer will scale the image down automatically to the right size for you, but if it's the wrong aspect ratio then it will squish in a way that will affect prediction performance. 
+
 To eyeball some screenshots, just run the "predict" mode:
 
 ```
