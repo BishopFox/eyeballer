@@ -55,11 +55,11 @@ sudo pip3 install -r requirements-gpu.txt
 
 **Pretrained Weights**
 
-For the latest pretrained weights, check out the releases.
+For the latest pretrained weights, check out the releases here on GitHub.
 
 **Training Data** You can find our training data here:
 
-https://www.dropbox.com/sh/usd03z9s0vnhzxu/AADyJvWgzlL1w4WnaAuxQbQQa?dl=1
+https://www.dropbox.com/s/rpylhiv2g0kokts/eyeballer-3.0.zip?dl=1
 
 There's two things you need from the training data:
 
@@ -71,7 +71,7 @@ Copy all three into the root of the Eyeballer code tree.
 
 ## Predicting Labels
 
-NOTE: For best results, make sure you screenshot your websites in a native 1.6x aspect ratio. IE: 1440x900. Eyeballer will scale the image down automatically to the right size for you, but if it's the wrong aspect ratio then it will squish in a way that will affect prediction performance. 
+NOTE: For best results, make sure you screenshot your websites in a native 1.6x aspect ratio. IE: 1440x900. Eyeballer will scale the image down automatically to the right size for you, but if it's the wrong aspect ratio then it will squish in a way that will affect prediction performance.
 
 To eyeball some screenshots, just run the "predict" mode:
 
