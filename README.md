@@ -107,7 +107,7 @@ Eyeballer's performance is measured against an evaluation dataset, which is 20% 
 | Old Looking | 91.70% | 62.20% |
 | Parked Domain | 70.99% | 66.43% |
 
-For a detailed explanation on [Precision vs Recall, check out Wikipedia](https://en.wikipedia.org/wiki/Precision_and_recall]).
+For a detailed explanation on [Precision vs Recall, check out Wikipedia](https://en.wikipedia.org/wiki/Precision_and_recall).
 
 ## Training
 To train a new model, run:
