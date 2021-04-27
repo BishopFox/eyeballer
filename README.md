@@ -65,7 +65,7 @@ There's two things you need from the training data:
 
 1. `images/` folder, containing all the screenshots (resized down to 224x224)
 2. `labels.csv` that has all the labels
-3. `bishop-fox-pretrained-v2.h5` A pretrained weights file you can use right out of the box without training.
+3. `bishop-fox-pretrained-v3.h5` A pretrained weights file you can use right out of the box without training.
 
 Copy all three into the root of the Eyeballer code tree.
 
@@ -87,6 +87,27 @@ eyeballer.py --weights YOUR_WEIGHTS.h5 predict PATH_TO/YOUR_FILES/
 
 Eyeballer will spit the results back to you in human readable format (a `results.html` file so you can browse it easily) and machine readable format (a `results.csv` file).
 
+## Performance
+
+Eyeballer's performance is measured against an evaluation dataset, which is 20% of the overall screenshots chosen at random. Since these screenshots are never used in training, they can be an effective way to see how well the model is performing. Here are the latest results:
+
+| Overall Binary Accuracy | 93.52% |
+| ------ |:-----:|
+| **All-or-Nothing Accuracy** | **76.09%** |
+
+**Overall Binary Accuracy** is probably what you think of as the model's "accuracy". It's the chance, given any single label, that it is correct.
+
+**All-or-Nothing Accuracy** is more strict. For this, we consider all of an image's labels and consider it a failure if ANY label is wrong. This accuracy rating is the chance that the model correctly predicts all labels for any given image.
+
+| Label | Precision | Recall |
+| ------ | ------ |:-----:|
+| Custom 404 | 80.20% | 91.01% |
+| Login Page | 86.41% | 88.47% |
+| Webapp | 95.32% | 96.83% |
+| Old Looking | 91.70% | 62.20% |
+| Parked Domain | 70.99% | 66.43% |
+
+For a detailed explanation on [Precision vs Recall, check out Wikipedia](https://en.wikipedia.org/wiki/Precision_and_recall]).
 
 ## Training
 To train a new model, run:
