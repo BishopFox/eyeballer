@@ -5,8 +5,10 @@
   </h2>
 
   <span fxFlex></span>
+  <span>Bishop Fox R&D</span>
+  <span fxFlex></span>
 
-  <button mat-raised-button  (click)="restart()">
+  <button mat-raised-button (click)="restart()">
     <i class="fas fa-fw fa-undo"></i>
     Restart
   </button>
@@ -61,47 +63,53 @@
 <div *ngIf="tfFilesCompleted && !eyeballing && eyeballCompleted">
   <div class="results-container">
     <h2>Results</h2>
-    <div>
-      <div>
-        <button class="include-button" mat-raised-button [disabled]="selected.webapp === 0" (click)="selected.webapp = 0; updateSelections()">Must Include</button>
-        <button mat-raised-button [disabled]="selected.webapp === 1" (click)="selected.webapp = 1; updateSelections()">Webapp</button>
-        <button class="reject-button" mat-raised-button [disabled]="selected.webapp === 2" (click)="selected.webapp = 2; updateSelections()">Never Include</button>
+    <mat-toolbar>
+      <mat-toolbar-row>
+        <span class="button-spacer"></span>
+        <button class="label-button" mat-raised-button color="primary" [disabled]="selected.webapp === 0" (click)="selected.webapp = 0; updateSelections()">Must Include</button>
+        <button class="label-button" mat-raised-button color="basic" [disabled]="selected.webapp === 1" (click)="selected.webapp = 1; updateSelections()">Webapp</button>
+        <button class="label-button" mat-raised-button color="accent" [disabled]="selected.webapp === 2" (click)="selected.webapp = 2; updateSelections()">Never Include</button>
         <label class="label-count">{{ classifications.webapp.length }}</label>
-      </div>
-      <div>
-        <button class="include-button" mat-raised-button [disabled]="selected.oldLooking === 0" (click)="selected.oldLooking = 0; updateSelections()">Must Include</button>
-        <button mat-raised-button [disabled]="selected.oldLooking === 1" (click)="selected.oldLooking = 1; updateSelections()">Old Looking</button>
-        <button class="reject-button" mat-raised-button [disabled]="selected.oldLooking === 2" (click)="selected.oldLooking = 2; updateSelections()">Never Include</button>
+        <span class="button-spacer"></span>
+      </mat-toolbar-row>
+      <mat-toolbar-row>
+        <span class="button-spacer"></span>
+        <button class="label-button" mat-raised-button color="primary" [disabled]="selected.oldLooking === 0" (click)="selected.oldLooking = 0; updateSelections()">Must Include</button>
+        <button class="label-button" mat-raised-button color="basic" [disabled]="selected.oldLooking === 1" (click)="selected.oldLooking = 1; updateSelections()">Old Looking</button>
+        <button class="label-button" mat-raised-button color="accent" [disabled]="selected.oldLooking === 2" (click)="selected.oldLooking = 2; updateSelections()">Never Include</button>
         <label class="label-count">{{ classifications.oldLooking.length }}</label>
-      </div>
-      <div>
-        <button class="include-button" mat-raised-button [disabled]="selected.loginPage === 0" (click)="selected.loginPage = 0; updateSelections()">Must Include</button>
-        <button mat-raised-button [disabled]="selected.loginPage === 1" (click)="selected.loginPage = 1; updateSelections()">Login Page</button>
-        <button class="reject-button" mat-raised-button [disabled]="selected.loginPage === 2" (click)="selected.loginPage = 2; updateSelections()">Never Include</button>
+        <span class="button-spacer"></span>
+      </mat-toolbar-row>
+      <mat-toolbar-row>
+        <span class="button-spacer"></span>
+        <button class="label-button" mat-raised-button color="primary" mat-raised-button [disabled]="selected.loginPage === 0" (click)="selected.loginPage = 0; updateSelections()">Must Include</button>
+        <button class="label-button" mat-raised-button color="basic" [disabled]="selected.loginPage === 1" (click)="selected.loginPage = 1; updateSelections()">Login Page</button>
+        <button class="label-button" mat-raised-button color="accent" [disabled]="selected.loginPage === 2" (click)="selected.loginPage = 2; updateSelections()">Never Include</button>
         <label class="label-count">{{ classifications.loginPage.length }}</label>
-      </div>
-      <div>
-        <button class="include-button" mat-raised-button [disabled]="selected.custom404 === 0" (click)="selected.custom404 = 0; updateSelections()">Must Include</button>
-        <button mat-raised-button [disabled]="selected.custom404 === 1" (click)="selected.custom404 = 1; updateSelections()">Custom 404</button>
-        <button class="reject-button" mat-raised-button [disabled]="selected.custom404 === 2" (click)="selected.custom404 = 2; updateSelections()">Never Include</button>
+        <span class="button-spacer"></span>
+      </mat-toolbar-row>
+      <mat-toolbar-row>
+        <span class="button-spacer"></span>
+        <button class="label-button" mat-raised-button color="primary" mat-raised-button [disabled]="selected.custom404 === 0" (click)="selected.custom404 = 0; updateSelections()">Must Include</button>
+        <button class="label-button" mat-raised-button color="basic" [disabled]="selected.custom404 === 1" (click)="selected.custom404 = 1; updateSelections()">Custom 404</button>
+        <button class="label-button" mat-raised-button color="accent" [disabled]="selected.custom404 === 2" (click)="selected.custom404 = 2; updateSelections()">Never Include</button>
         <label class="label-count">{{ classifications.custom404.length }}</label>
-      </div>
-      <div>
-        <button class="include-button" mat-raised-button [disabled]="selected.parked === 0" (click)="selected.parked = 0; updateSelections()">Must Include</button>
-        <button mat-raised-button [disabled]="selected.parked === 1" (click)="selected.parked = 1; updateSelections()">Parked Domain</button>
-        <button class="reject-button" mat-raised-button [disabled]="selected.parked === 2" (click)="selected.parked = 2; updateSelections()">Never Include</button>
+        <span class="button-spacer"></span>
+      </mat-toolbar-row>
+      <mat-toolbar-row>
+        <span class="button-spacer"></span>
+        <button class="label-button" mat-raised-button color="primary" mat-raised-button [disabled]="selected.parked === 0" (click)="selected.parked = 0; updateSelections()">Must Include</button>
+        <button class="label-button" mat-raised-button color="basic" [disabled]="selected.parked === 1" (click)="selected.parked = 1; updateSelections()">Parked Domain</button>
+        <button class="label-button" mat-raised-button color="accent" [disabled]="selected.parked === 2" (click)="selected.parked = 2; updateSelections()">Never Include</button>
         <label class="label-count">{{ classifications.parked.length }}</label>
-      </div>
-    </div>
+        <span class="button-spacer"></span>
+      </mat-toolbar-row>
+    </mat-toolbar>
 
     <button mat-raised-button (click)="exportResults()">
       Export
     </button>
     Total Selected: {{ selectedScreens.length }}
-
-    <div>
-      Preview:
-    </div>
 
     <div class="eyeballed-class-container">
       <div *ngFor="let key of selectedScreens.slice(0, 8); let index = index" [attr.data-index]="index">
@@ -111,7 +119,7 @@
                 {{ key }}
             </mat-card-title>
           </mat-card-header>
-          <img class="preview-image" style="width:100%;" mat-card-image src="{{images.get(key)}}">
+          <img class="preview-image" mat-card-image src="{{images.get(key)}}">
           <span class="webapp-label">{{ isWebapp(key) }}</span>
           <span class="custom-404-label">{{ isCustom404(key) }}</span>
           <span class="login-label">{{ isLoginPage(key) }}</span>

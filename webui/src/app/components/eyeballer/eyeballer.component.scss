@@ -49,10 +49,6 @@
     opacity: .5;
 }
 
-// .result-card:hover div {
-//     display: block;
-// }
-
 .result-card > div {
     display: none;
     position: absolute;
@@ -69,26 +65,6 @@
 
 .fill-space {
     flex: auto;
-}
-
-.label-count {
-    margin-left: 10px;
-}
-
-.include-button {
-  background-color: #3fa600;
-}
-
-.include-button:disabled {
-  background-color: #006802;
-}
-
-.reject-button {
-  background-color: red;
-}
-
-.reject-button:disabled {
-  background-color: #700000;
 }
 
 .img-container {
@@ -130,4 +106,19 @@
   color: white;
   margin-left: 1px;
   margin-right: 1px;
+}
+
+.label-count {
+  margin-left: 10px;
+  width: 50px!important;
+  min-width: unset!important;
+}
+
+.label-button{
+  width: 130px!important;
+  min-width: unset!important;
+}
+
+.button-spacer {
+  flex: 1 1 auto;
 }
