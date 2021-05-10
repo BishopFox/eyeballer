@@ -1,0 +1,125 @@
+<mat-toolbar class="app-toolbar" color="primary"  fxLayout="row" fxLayoutAlign="start center">
+  <h2>
+    <i class="fas fa-eye fa-fw"></i>
+    Eyeballer
+  </h2>
+
+  <span fxFlex></span>
+
+  <button mat-raised-button  (click)="restart()">
+    <i class="fas fa-fw fa-undo"></i>
+    Restart
+  </button>
+
+</mat-toolbar>
+
+<!-- Model Loading Progress -->
+<div *ngIf="!tfFilesCompleted">
+  <mat-progress-bar mode="indeterminate"></mat-progress-bar>
+</div>
+
+<!-- Drop Zone -->
+<div *ngIf="tfFilesCompleted && !eyeballing && !eyeballCompleted">
+  <mat-card>
+
+    <button mat-raised-button (click)="startEyeball()">
+      Start
+    </button>
+
+    <br />
+    <br />
+
+    <ngx-dropzone (change)="onSelect($event)">
+      <ngx-dropzone-label>
+        Files dropped here are <span style="font-weight: bold">not uploaded anywhere.</span> No data leaves your computer at all on this tool.
+      </ngx-dropzone-label>
+    </ngx-dropzone>
+  </mat-card>
+
+  <br />
+
+  <mat-card><span style="font-weight: bold">Note:</span> For best results,
+    ensure your screenshots are taken natively in a <span style="font-weight: bold">16:10 aspect ratio.</span> (ie: 1440x900 or other)</mat-card>
+</div>
+
+<!-- Progress Bar -->
+<div *ngIf="tfFilesCompleted && eyeballing && !eyeballCompleted">
+  <mat-card>
+    <h3>Loading Images: {{this.images.size}} of {{this.imageCount}}</h3>
+    <mat-progress-bar mode="determinate" [value]="loadPercent()"></mat-progress-bar>
+  </mat-card>
+  <mat-card>
+    <h3>Classifying: {{this.eyeballedCount}} of {{this.imageCount}}</h3>
+    <mat-progress-bar mode="determinate" [value]="eyeballPercent()"></mat-progress-bar>
+  </mat-card>
+  <mat-card>
+    This processing is happening in your browser. <span style="font-weight: bold">There is no backend.</span>
+  </mat-card>
+</div>
+
+<!-- Results -->
+<div *ngIf="tfFilesCompleted && !eyeballing && eyeballCompleted">
+  <div class="results-container">
+    <h2>Results</h2>
+    <div>
+      <div>
+        <button class="include-button" mat-raised-button [disabled]="selected.webapp === 0" (click)="selected.webapp = 0; updateSelections()">Must Include</button>
+        <button mat-raised-button [disabled]="selected.webapp === 1" (click)="selected.webapp = 1; updateSelections()">Webapp</button>
+        <button class="reject-button" mat-raised-button [disabled]="selected.webapp === 2" (click)="selected.webapp = 2; updateSelections()">Never Include</button>
+        <label class="label-count">{{ classifications.webapp.length }}</label>
+      </div>
+      <div>
+        <button class="include-button" mat-raised-button [disabled]="selected.oldLooking === 0" (click)="selected.oldLooking = 0; updateSelections()">Must Include</button>
+        <button mat-raised-button [disabled]="selected.oldLooking === 1" (click)="selected.oldLooking = 1; updateSelections()">Old Looking</button>
+        <button class="reject-button" mat-raised-button [disabled]="selected.oldLooking === 2" (click)="selected.oldLooking = 2; updateSelections()">Never Include</button>
+        <label class="label-count">{{ classifications.oldLooking.length }}</label>
+      </div>
+      <div>
+        <button class="include-button" mat-raised-button [disabled]="selected.loginPage === 0" (click)="selected.loginPage = 0; updateSelections()">Must Include</button>
+        <button mat-raised-button [disabled]="selected.loginPage === 1" (click)="selected.loginPage = 1; updateSelections()">Login Page</button>
+        <button class="reject-button" mat-raised-button [disabled]="selected.loginPage === 2" (click)="selected.loginPage = 2; updateSelections()">Never Include</button>
+        <label class="label-count">{{ classifications.loginPage.length }}</label>
+      </div>
+      <div>
+        <button class="include-button" mat-raised-button [disabled]="selected.custom404 === 0" (click)="selected.custom404 = 0; updateSelections()">Must Include</button>
+        <button mat-raised-button [disabled]="selected.custom404 === 1" (click)="selected.custom404 = 1; updateSelections()">Custom 404</button>
+        <button class="reject-button" mat-raised-button [disabled]="selected.custom404 === 2" (click)="selected.custom404 = 2; updateSelections()">Never Include</button>
+        <label class="label-count">{{ classifications.custom404.length }}</label>
+      </div>
+      <div>
+        <button class="include-button" mat-raised-button [disabled]="selected.parked === 0" (click)="selected.parked = 0; updateSelections()">Must Include</button>
+        <button mat-raised-button [disabled]="selected.parked === 1" (click)="selected.parked = 1; updateSelections()">Parked Domain</button>
+        <button class="reject-button" mat-raised-button [disabled]="selected.parked === 2" (click)="selected.parked = 2; updateSelections()">Never Include</button>
+        <label class="label-count">{{ classifications.parked.length }}</label>
+      </div>
+    </div>
+
+    <button mat-raised-button (click)="exportResults()">
+      Export
+    </button>
+    Total Selected: {{ selectedScreens.length }}
+
+    <div>
+      Preview:
+    </div>
+
+    <div class="eyeballed-class-container">
+      <div *ngFor="let key of selectedScreens.slice(0, 8); let index = index" [attr.data-index]="index">
+        <mat-card class="result-card">
+          <mat-card-header>
+            <mat-card-title>
+                {{ key }}
+            </mat-card-title>
+          </mat-card-header>
+          <img class="preview-image" style="width:100%;" mat-card-image src="{{images.get(key)}}">
+          <span class="webapp-label">{{ isWebapp(key) }}</span>
+          <span class="custom-404-label">{{ isCustom404(key) }}</span>
+          <span class="login-label">{{ isLoginPage(key) }}</span>
+          <span class="old-looking-label">{{ isOldLooking(key) }}</span>
+          <span class="parked-label">{{ isParked(key) }}</span>
+        </mat-card>
+      </div>
+    </div>
+  </div>
+
+</div>
