@@ -1407,7 +1407,7 @@
                   switch (_context4.prev = _context4.next) {
                     case 0:
                       _context4.next = 2;
-                      return fetch('/assets/tf/model.json');
+                      return fetch('assets/tf/model.json');
 
                     case 2:
                       resp = _context4.sent;
@@ -1419,7 +1419,7 @@
                       paths = Array.from((_a = manifest.weightsManifest[0]) === null || _a === void 0 ? void 0 : _a.paths);
                       this.tfFiles = [];
                       _context4.next = 10;
-                      return fetch('/assets/tf/model.json');
+                      return fetch('assets/tf/model.json');
 
                     case 10:
                       resp = _context4.sent;
@@ -1475,7 +1475,7 @@
                     case 0:
                       base = name.split('/').reverse()[0];
                       _context5.next = 3;
-                      return fetch("/assets/tf/".concat(base));
+                      return fetch("assets/tf/".concat(base));
 
                     case 3:
                       resp = _context5.sent;

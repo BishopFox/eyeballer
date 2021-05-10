@@ -653,11 +653,11 @@ class EyeballerComponent {
     fetchTfFiles() {
         var _a;
         return Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__awaiter"])(this, void 0, void 0, function* () {
-            let resp = yield fetch('/assets/tf/model.json');
+            let resp = yield fetch('assets/tf/model.json');
             const manifest = yield resp.json();
             const paths = Array.from((_a = manifest.weightsManifest[0]) === null || _a === void 0 ? void 0 : _a.paths);
             this.tfFiles = [];
-            resp = yield fetch('/assets/tf/model.json');
+            resp = yield fetch('assets/tf/model.json');
             const blob = yield resp.blob();
             this.tfFiles.push(new File([blob], 'model.json'));
             yield Promise.all(paths.map((path) => Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__awaiter"])(this, void 0, void 0, function* () {
@@ -670,7 +670,7 @@ class EyeballerComponent {
     fetchTfFile(name) {
         return Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__awaiter"])(this, void 0, void 0, function* () {
             const base = name.split('/').reverse()[0];
-            const resp = yield fetch(`/assets/tf/${base}`);
+            const resp = yield fetch(`assets/tf/${base}`);
             const blob = yield resp.blob();
             return new File([blob], base);
         });
