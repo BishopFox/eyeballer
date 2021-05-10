@@ -120,3 +120,9 @@ results.html
 !tests/data/*
 !docs/*
 logs/*
+
+images.7z
+images.tar.xz
+images.zip
+images/
+images_full_size/
