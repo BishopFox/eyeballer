@@ -40,7 +40,11 @@
   <br />
 
   <mat-card><span style="font-weight: bold">Note:</span> For best results,
-    ensure your screenshots are taken natively in a <span style="font-weight: bold">16:10 aspect ratio.</span> (ie: 1440x900 or other)</mat-card>
+    ensure your screenshots are taken natively in a <span style="font-weight: bold">16:10 aspect ratio.</span> (ie: 1440x900 or other)
+  </mat-card>
+  <mat-card>
+    Source code available at <a href="https://github.com/BishopFox/eyeballer" target="_blank" rel="noopener noreferrer">GitHub</a>
+  </mat-card>
 </div>
 
 <!-- Progress Bar -->
@@ -105,10 +109,16 @@
       </mat-toolbar-row>
     </mat-toolbar>
 
-    <button mat-raised-button (click)="exportResults()">
-      Export
-    </button>
-    Total Selected: {{ selectedScreens.length }}
+
+    <mat-card>
+      <mat-card>
+        Total Selected: {{ selectedScreens.length }}
+      </mat-card>
+      <button mat-raised-button color="primary" (click)="exportResults()">
+        Export
+      </button>
+      <a href="https://github.com/BishopFox/eyeballer#what-the-labels-mean" target="_blank" rel="noopener noreferrer">What do these labels mean?</a>
+    </mat-card>
 
     <div class="eyeballed-class-container">
       <div *ngFor="let key of selectedScreens.slice(0, 8); let index = index" [attr.data-index]="index">
