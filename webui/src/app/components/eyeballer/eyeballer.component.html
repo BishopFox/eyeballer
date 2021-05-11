@@ -23,7 +23,7 @@
 <div *ngIf="tfFilesCompleted && !eyeballing && !eyeballCompleted">
   <mat-card>
 
-    <button mat-raised-button (click)="startEyeball()">
+    <button color="primary" mat-raised-button (click)="startEyeball()" [disabled]="this.imageCount === 0">
       Start
     </button>
 
