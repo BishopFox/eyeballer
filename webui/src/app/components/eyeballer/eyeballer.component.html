@@ -67,7 +67,7 @@
   <div class="results-container">
     <h2>Results</h2>
     <mat-toolbar>
-      <mat-toolbar-row>
+      <mat-toolbar-row style="height:40px;">
         <span class="button-spacer"></span>
         <button class="label-button" mat-raised-button color="primary" [disabled]="selected.webapp === 0" (click)="selected.webapp = 0; updateSelections()">Must Include</button>
         <button class="label-button" mat-raised-button color="basic" [disabled]="selected.webapp === 1" (click)="selected.webapp = 1; updateSelections()">Webapp</button>
@@ -75,7 +75,7 @@
         <label class="label-count">{{ classifications.webapp.length }}</label>
         <span class="button-spacer"></span>
       </mat-toolbar-row>
-      <mat-toolbar-row>
+      <mat-toolbar-row style="height:40px;">
         <span class="button-spacer"></span>
         <button class="label-button" mat-raised-button color="primary" [disabled]="selected.oldLooking === 0" (click)="selected.oldLooking = 0; updateSelections()">Must Include</button>
         <button class="label-button" mat-raised-button color="basic" [disabled]="selected.oldLooking === 1" (click)="selected.oldLooking = 1; updateSelections()">Old Looking</button>
@@ -83,7 +83,7 @@
         <label class="label-count">{{ classifications.oldLooking.length }}</label>
         <span class="button-spacer"></span>
       </mat-toolbar-row>
-      <mat-toolbar-row>
+      <mat-toolbar-row style="height:40px;">
         <span class="button-spacer"></span>
         <button class="label-button" mat-raised-button color="primary" mat-raised-button [disabled]="selected.loginPage === 0" (click)="selected.loginPage = 0; updateSelections()">Must Include</button>
         <button class="label-button" mat-raised-button color="basic" [disabled]="selected.loginPage === 1" (click)="selected.loginPage = 1; updateSelections()">Login Page</button>
@@ -91,7 +91,7 @@
         <label class="label-count">{{ classifications.loginPage.length }}</label>
         <span class="button-spacer"></span>
       </mat-toolbar-row>
-      <mat-toolbar-row>
+      <mat-toolbar-row style="height:40px;">
         <span class="button-spacer"></span>
         <button class="label-button" mat-raised-button color="primary" mat-raised-button [disabled]="selected.custom404 === 0" (click)="selected.custom404 = 0; updateSelections()">Must Include</button>
         <button class="label-button" mat-raised-button color="basic" [disabled]="selected.custom404 === 1" (click)="selected.custom404 = 1; updateSelections()">Custom 404</button>
@@ -99,7 +99,7 @@
         <label class="label-count">{{ classifications.custom404.length }}</label>
         <span class="button-spacer"></span>
       </mat-toolbar-row>
-      <mat-toolbar-row>
+      <mat-toolbar-row style="height:40px;">
         <span class="button-spacer"></span>
         <button class="label-button" mat-raised-button color="primary" mat-raised-button [disabled]="selected.parked === 0" (click)="selected.parked = 0; updateSelections()">Must Include</button>
         <button class="label-button" mat-raised-button color="basic" [disabled]="selected.parked === 1" (click)="selected.parked = 1; updateSelections()">Parked Domain</button>
@@ -109,12 +109,12 @@
       </mat-toolbar-row>
     </mat-toolbar>
 
-
     <mat-card>
-      <mat-card>
-        Total Selected: {{ selectedScreens.length }}
-      </mat-card>
-      <button mat-raised-button color="primary" (click)="exportResults()">
+      <span style="font-weight: bold">Total Selected:</span> {{ selectedScreens.length }}
+    </mat-card>
+    <br>
+    <mat-card>
+      <button class="export-button" mat-raised-button color="primary" (click)="exportResults()">
         Export
       </button>
       <a href="https://github.com/BishopFox/eyeballer#what-the-labels-mean" target="_blank" rel="noopener noreferrer">What do these labels mean?</a>
