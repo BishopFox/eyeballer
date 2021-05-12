@@ -22,15 +22,9 @@
 <!-- Drop Zone -->
 <div *ngIf="tfFilesCompleted && !eyeballing && !eyeballCompleted">
   <mat-card>
-
-    <button color="primary" mat-raised-button (click)="startEyeball()" [disabled]="this.imageCount === 0">
-      Start
-    </button>
-
-    <br />
-    <br />
-
-    <ngx-dropzone (change)="onSelect($event)">
+    Drop your screenshots below:
+    <br><br>
+    <ngx-dropzone (change)="onSelect($event); startEyeball()">
       <ngx-dropzone-label>
         Files dropped here are <span style="font-weight: bold">not uploaded anywhere.</span> No data leaves your computer at all on this tool.
       </ngx-dropzone-label>
