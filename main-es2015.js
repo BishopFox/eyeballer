@@ -630,7 +630,6 @@ class EyeballerComponent {
     }
     onSelect(event) {
         return Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__awaiter"])(this, void 0, void 0, function* () {
-            console.log(event);
             this.imageCount = event.addedFiles.length;
             yield Promise.all(event.addedFiles.map((file) => Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__awaiter"])(this, void 0, void 0, function* () {
                 const dataString = yield this.dataURI(file);
@@ -700,7 +699,6 @@ class EyeballerComponent {
         return Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__awaiter"])(this, void 0, void 0, function* () {
             yield this.eyeballScan();
             yield this.updateSelections();
-            console.log(this.classifications);
         });
     }
     updateSelections() {
@@ -776,7 +774,6 @@ class EyeballerComponent {
     }
     eyeballScan() {
         return Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__awaiter"])(this, void 0, void 0, function* () {
-            console.log('eyeballing ...');
             this.eyeballing = true;
             const model = yield _tensorflow_tfjs__WEBPACK_IMPORTED_MODULE_2__["loadLayersModel"](_tensorflow_tfjs__WEBPACK_IMPORTED_MODULE_2__["io"].browserFiles(this.tfFiles));
             const keys = Array.from(this.images.keys());
@@ -789,10 +786,17 @@ class EyeballerComponent {
         return Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__awaiter"])(this, void 0, void 0, function* () {
             const img = new Image(this.width, this.height);
             img.src = this.images.get(key);
-            console.log("Queued up image: " + key);
             this.loadedCount++;
+            // On error, basically just ignore the image
+            img.onerror = () => {
+                this.eyeballedCount++;
+                if (this.eyeballedCount >= this.imageCount) {
+                    this.eyeballing = false;
+                    this.eyeballCompleted = true;
+                    this.updateSelections();
+                }
+            };
             img.onload = () => {
-                console.log(`classifying: ${key}`);
                 const tensor = _tensorflow_tfjs__WEBPACK_IMPORTED_MODULE_2__["browser"].fromPixels(img)
                     .resizeNearestNeighbor([224, 224])
                     .toFloat()
@@ -800,30 +804,23 @@ class EyeballerComponent {
                     .div(this.offset)
                     .expandDims();
                 const predictions = model.predict(tensor).dataSync();
-                console.log(`${predictions}`);
                 if (predictions[0] > this.confidence) {
-                    console.log(`Custom 404: ${key}`);
                     this.classifications.custom404.push(key);
                 }
                 if (predictions[1] > this.confidence) {
-                    console.log(`Login Page: ${key}`);
                     this.classifications.loginPage.push(key);
                 }
                 if (predictions[2] > this.confidence) {
-                    console.log(`webapp: ${key}`);
                     this.classifications.webapp.push(key);
                 }
                 if (predictions[3] > this.confidence) {
-                    console.log(`Old Looking: ${key}`);
                     this.classifications.oldLooking.push(key);
                 }
                 if (predictions[4] > this.confidence) {
-                    console.log(`Parked: ${key}`);
                     this.classifications.parked.push(key);
                 }
                 this.eyeballedCount++;
                 if (this.eyeballedCount >= this.imageCount) {
-                    console.log('eyeballed all images');
                     this.eyeballing = false;
                     this.eyeballCompleted = true;
                     this.updateSelections();
@@ -837,7 +834,6 @@ class EyeballerComponent {
             const buf = yield file.arrayBuffer();
             let ext = (_a = file.name.split('.').reverse()[0]) === null || _a === void 0 ? void 0 : _a.toLocaleLowerCase();
             if (!["jpg", "jpeg", "png", "gif", "bmp"].some(allow => allow === ext)) {
-                console.log(`Unknown file type ${ext}, defaulting to jpg`);
                 ext = "jpg";
             }
             return `data:image/${encodeURIComponent(ext)};base64,${base64_arraybuffer__WEBPACK_IMPORTED_MODULE_1__["encode"](buf)}`;

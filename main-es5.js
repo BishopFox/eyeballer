@@ -1346,9 +1346,8 @@
                 while (1) {
                   switch (_context2.prev = _context2.next) {
                     case 0:
-                      console.log(event);
                       this.imageCount = event.addedFiles.length;
-                      _context2.next = 4;
+                      _context2.next = 3;
                       return Promise.all(event.addedFiles.map(function (file) {
                         return Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__awaiter"])(_this, void 0, void 0, /*#__PURE__*/regeneratorRuntime.mark(function _callee() {
                           var dataString;
@@ -1372,7 +1371,7 @@
                         }));
                       }));
 
-                    case 4:
+                    case 3:
                     case "end":
                       return _context2.stop();
                   }
@@ -1547,9 +1546,6 @@
                       return this.updateSelections();
 
                     case 4:
-                      console.log(this.classifications);
-
-                    case 5:
                     case "end":
                       return _context6.stop();
                   }
@@ -1772,15 +1768,14 @@
                 while (1) {
                   switch (_context9.prev = _context9.next) {
                     case 0:
-                      console.log('eyeballing ...');
                       this.eyeballing = true;
-                      _context9.next = 4;
+                      _context9.next = 3;
                       return _tensorflow_tfjs__WEBPACK_IMPORTED_MODULE_2__["loadLayersModel"](_tensorflow_tfjs__WEBPACK_IMPORTED_MODULE_2__["io"].browserFiles(this.tfFiles));
 
-                    case 4:
+                    case 3:
                       model = _context9.sent;
                       keys = Array.from(this.images.keys());
-                      _context9.next = 8;
+                      _context9.next = 7;
                       return Promise.all(keys.map(function (key) {
                         return Object(tslib__WEBPACK_IMPORTED_MODULE_0__["__awaiter"])(_this4, void 0, void 0, /*#__PURE__*/regeneratorRuntime.mark(function _callee8() {
                           return regeneratorRuntime.wrap(function _callee8$(_context8) {
@@ -1799,7 +1794,7 @@
                         }));
                       }));
 
-                    case 8:
+                    case 7:
                     case "end":
                       return _context9.stop();
                   }
@@ -1820,51 +1815,47 @@
                     case 0:
                       img = new Image(this.width, this.height);
                       img.src = this.images.get(key);
-                      console.log("Queued up image: " + key);
-                      this.loadedCount++;
+                      this.loadedCount++; // On error, basically just ignore the image
+
+                      img.onerror = function () {
+                        _this5.eyeballedCount++;
+
+                        if (_this5.eyeballedCount >= _this5.imageCount) {
+                          _this5.eyeballing = false;
+                          _this5.eyeballCompleted = true;
+
+                          _this5.updateSelections();
+                        }
+                      };
 
                       img.onload = function () {
-                        console.log("classifying: ".concat(key));
-
                         var tensor = _tensorflow_tfjs__WEBPACK_IMPORTED_MODULE_2__["browser"].fromPixels(img).resizeNearestNeighbor([224, 224]).toFloat().sub(_this5.offset).div(_this5.offset).expandDims();
 
                         var predictions = model.predict(tensor).dataSync();
-                        console.log("".concat(predictions));
 
                         if (predictions[0] > _this5.confidence) {
-                          console.log("Custom 404: ".concat(key));
-
                           _this5.classifications.custom404.push(key);
                         }
 
                         if (predictions[1] > _this5.confidence) {
-                          console.log("Login Page: ".concat(key));
-
                           _this5.classifications.loginPage.push(key);
                         }
 
                         if (predictions[2] > _this5.confidence) {
-                          console.log("webapp: ".concat(key));
-
                           _this5.classifications.webapp.push(key);
                         }
 
                         if (predictions[3] > _this5.confidence) {
-                          console.log("Old Looking: ".concat(key));
-
                           _this5.classifications.oldLooking.push(key);
                         }
 
                         if (predictions[4] > _this5.confidence) {
-                          console.log("Parked: ".concat(key));
-
                           _this5.classifications.parked.push(key);
                         }
 
                         _this5.eyeballedCount++;
 
                         if (_this5.eyeballedCount >= _this5.imageCount) {
-                          console.log('eyeballed all images');
                           _this5.eyeballing = false;
                           _this5.eyeballCompleted = true;
 
@@ -1901,7 +1892,6 @@
                       if (!["jpg", "jpeg", "png", "gif", "bmp"].some(function (allow) {
                         return allow === ext;
                       })) {
-                        console.log("Unknown file type ".concat(ext, ", defaulting to jpg"));
                         ext = "jpg";
                       }
 
