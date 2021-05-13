@@ -211,6 +211,15 @@ export class EyeballerComponent implements OnInit {
     const img = new Image(this.width, this.height);
     img.src = this.images.get(key);
     this.loadedCount++;
+    // On error, basically just ignore the image
+    img.onerror = () => {
+      this.eyeballedCount++;
+      if (this.eyeballedCount >= this.imageCount) {
+        this.eyeballing = false;
+        this.eyeballCompleted = true;
+        this.updateSelections();
+      }
+    }
     img.onload = () => {
       const tensor = tf.browser.fromPixels(img)
         .resizeNearestNeighbor([224, 224])
