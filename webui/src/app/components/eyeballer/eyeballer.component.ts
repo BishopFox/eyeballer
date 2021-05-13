@@ -56,7 +56,6 @@ export class EyeballerComponent implements OnInit {
   }
 
   async onSelect(event) {
-    console.log(event);
     this.imageCount = event.addedFiles.length;
     await Promise.all(event.addedFiles.map(async (file) => {
       const dataString = await this.dataURI(file);
@@ -125,7 +124,6 @@ export class EyeballerComponent implements OnInit {
   async startEyeball() {
     await this.eyeballScan();
     await this.updateSelections();
-    console.log(this.classifications);
   }
 
   async updateSelections() {
@@ -201,7 +199,6 @@ export class EyeballerComponent implements OnInit {
   }
 
   async eyeballScan(): Promise<void> {
-    console.log('eyeballing ...');
     this.eyeballing = true;
     const model = await tf.loadLayersModel(tf.io.browserFiles(this.tfFiles));
     const keys = Array.from(this.images.keys());
@@ -213,10 +210,8 @@ export class EyeballerComponent implements OnInit {
   async classifyImage(key: string, model: tf.LayersModel) {
     const img = new Image(this.width, this.height);
     img.src = this.images.get(key);
-    console.log("Queued up image: " + key)
     this.loadedCount++;
     img.onload = () => {
-      console.log(`classifying: ${key}`);
       const tensor = tf.browser.fromPixels(img)
         .resizeNearestNeighbor([224, 224])
         .toFloat()
@@ -224,31 +219,24 @@ export class EyeballerComponent implements OnInit {
         .div(this.offset)
         .expandDims();
       const predictions = (<tf.Tensor<tf.Rank>> model.predict(tensor)).dataSync();
-      console.log(`${predictions}`);
       if (predictions[0] > this.confidence) {
-        console.log(`Custom 404: ${key}`);
         this.classifications.custom404.push(key);
       }
       if (predictions[1] > this.confidence) {
-        console.log(`Login Page: ${key}`);
         this.classifications.loginPage.push(key);
       }
       if (predictions[2] > this.confidence) {
-        console.log(`webapp: ${key}`);
         this.classifications.webapp.push(key);
       }
       if (predictions[3] > this.confidence) {
-        console.log(`Old Looking: ${key}`);
         this.classifications.oldLooking.push(key);
       }
       if (predictions[4] > this.confidence) {
-        console.log(`Parked: ${key}`);
         this.classifications.parked.push(key);
       }
       this.eyeballedCount++;
 
       if (this.eyeballedCount >= this.imageCount) {
-        console.log('eyeballed all images');
         this.eyeballing = false;
         this.eyeballCompleted = true;
         this.updateSelections();
@@ -260,7 +248,6 @@ export class EyeballerComponent implements OnInit {
     const buf = await file.arrayBuffer();
     let ext = file.name.split('.').reverse()[0]?.toLocaleLowerCase();
     if (!["jpg", "jpeg", "png", "gif", "bmp"].some(allow => allow === ext)) {
-      console.log(`Unknown file type ${ext}, defaulting to jpg`);
       ext = "jpg";
     }
     return `data:image/${encodeURIComponent(ext)};base64,${base64.encode(buf)}`;
