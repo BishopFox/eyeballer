@@ -12,7 +12,7 @@ export class EyeballerComponent implements OnInit {
 
   offset = tf.scalar(127.5);
   images = new Map<string, string>();
-  confidence = 0.6;
+  confidence = 0.5;
 
   width = 224;
   height = 224;
