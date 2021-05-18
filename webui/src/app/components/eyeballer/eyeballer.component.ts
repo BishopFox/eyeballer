@@ -20,6 +20,7 @@ export class EyeballerComponent implements OnInit {
   tfFilesCompleted = false;
   tfFiles: File[] = [];
 
+  maxWorkers = 20;
   imageCount = 0;
   loadedCount = 0;
   finishedLoading = false;
@@ -122,7 +123,7 @@ export class EyeballerComponent implements OnInit {
   }
 
   async startEyeball() {
-    await this.eyeballScan();
+    await this.executeQueue();
     await this.updateSelections();
   }
 
@@ -198,59 +199,76 @@ export class EyeballerComponent implements OnInit {
     this.selectedScreens = Array.from(selectedScreensSet);
   }
 
-  async eyeballScan(): Promise<void> {
+  async executeQueue(): Promise<void> {
     this.eyeballing = true;
     const model = await tf.loadLayersModel(tf.io.browserFiles(this.tfFiles));
     const keys = Array.from(this.images.keys());
-    await Promise.all(keys.map(async (key) => {
-      await this.classifyImage(key, model);
-    }));
-  }
+    let numOfWorkers = 0;
+    let taskIndex = 0;
 
-  async classifyImage(key: string, model: tf.LayersModel) {
-    const img = new Image(this.width, this.height);
-    img.src = this.images.get(key);
-    this.loadedCount++;
-    // On error, basically just ignore the image
-    img.onerror = () => {
-      this.eyeballedCount++;
-      if (this.eyeballedCount >= this.imageCount) {
-        this.eyeballing = false;
-        this.eyeballCompleted = true;
-        this.updateSelections();
-      }
-    }
-    img.onload = () => {
-      const tensor = tf.browser.fromPixels(img)
-        .resizeNearestNeighbor([224, 224])
-        .toFloat()
-        .sub(this.offset)
-        .div(this.offset)
-        .expandDims();
-      const predictions = (<tf.Tensor<tf.Rank>> model.predict(tensor)).dataSync();
-      if (predictions[0] > this.confidence) {
-        this.classifications.custom404.push(key);
-      }
-      if (predictions[1] > this.confidence) {
-        this.classifications.loginPage.push(key);
-      }
-      if (predictions[2] > this.confidence) {
-        this.classifications.webapp.push(key);
-      }
-      if (predictions[3] > this.confidence) {
-        this.classifications.oldLooking.push(key);
-      }
-      if (predictions[4] > this.confidence) {
-        this.classifications.parked.push(key);
-      }
-      this.eyeballedCount++;
+    return new Promise((complete) => {
+      const getNextTask = () => {
+        if (numOfWorkers < this.maxWorkers && taskIndex < this.imageCount) {
+          // Start the task
+          const img = new Image(this.width, this.height);
+          const key = keys[taskIndex];
+          img.src = this.images.get(key);
+          this.loadedCount++;
+          img.onerror = () => {
+            this.eyeballedCount++;
+            if (this.eyeballedCount >= this.imageCount) {
+              this.eyeballing = false;
+              this.eyeballCompleted = true;
+              this.updateSelections();
+            }
+            numOfWorkers--;
+            getNextTask();
+          }
+          img.onload = () => {
+            const tensor = tf.browser.fromPixels(img)
+              .resizeNearestNeighbor([224, 224])
+              .toFloat()
+              .sub(this.offset)
+              .div(this.offset)
+              .expandDims();
+            const predictions = (<tf.Tensor<tf.Rank>> model.predict(tensor)).dataSync();
+            if (predictions[0] > this.confidence) {
+              this.classifications.custom404.push(key);
+            }
+            if (predictions[1] > this.confidence) {
+              this.classifications.loginPage.push(key);
+            }
+            if (predictions[2] > this.confidence) {
+              this.classifications.webapp.push(key);
+            }
+            if (predictions[3] > this.confidence) {
+              this.classifications.oldLooking.push(key);
+            }
+            if (predictions[4] > this.confidence) {
+              this.classifications.parked.push(key);
+            }
+            this.eyeballedCount++;
 
-      if (this.eyeballedCount >= this.imageCount) {
-        this.eyeballing = false;
-        this.eyeballCompleted = true;
-        this.updateSelections();
-      }
-    };
+            if (this.eyeballedCount >= this.imageCount) {
+              this.eyeballing = false;
+              this.eyeballCompleted = true;
+              this.updateSelections();
+            }
+            numOfWorkers--;
+            getNextTask();
+          };
+
+          taskIndex++;
+          numOfWorkers++;
+          // keep the chain going by calling ourselves
+          getNextTask();
+        } else if (numOfWorkers === 0 && taskIndex === this.imageCount) {
+          complete();
+        }
+      };
+
+      getNextTask();
+    });
   }
 
   async dataURI(file: File): Promise<string> {
