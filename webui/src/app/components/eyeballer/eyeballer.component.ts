@@ -225,37 +225,42 @@ export class EyeballerComponent implements OnInit {
             getNextTask();
           }
           img.onload = () => {
-            const tensor = tf.browser.fromPixels(img)
-              .resizeNearestNeighbor([224, 224])
-              .toFloat()
-              .sub(this.offset)
-              .div(this.offset)
-              .expandDims();
-            const predictions = (<tf.Tensor<tf.Rank>> model.predict(tensor)).dataSync();
-            if (predictions[0] > this.confidence) {
-              this.classifications.custom404.push(key);
-            }
-            if (predictions[1] > this.confidence) {
-              this.classifications.loginPage.push(key);
-            }
-            if (predictions[2] > this.confidence) {
-              this.classifications.webapp.push(key);
-            }
-            if (predictions[3] > this.confidence) {
-              this.classifications.oldLooking.push(key);
-            }
-            if (predictions[4] > this.confidence) {
-              this.classifications.parked.push(key);
-            }
-            this.eyeballedCount++;
+            tf.tidy(() => {
+              const tensor = tf.browser.fromPixels(img)
+                .resizeNearestNeighbor([224, 224])
+                .toFloat()
+                .sub(this.offset)
+                .div(this.offset)
+                .expandDims();
+              const resultTensor = <tf.Tensor<tf.Rank>> model.predict(tensor);
+              const predictions = resultTensor.dataSync();
+              tensor.dispose();
+              resultTensor.dispose();
+              if (predictions[0] > this.confidence) {
+                this.classifications.custom404.push(key);
+              }
+              if (predictions[1] > this.confidence) {
+                this.classifications.loginPage.push(key);
+              }
+              if (predictions[2] > this.confidence) {
+                this.classifications.webapp.push(key);
+              }
+              if (predictions[3] > this.confidence) {
+                this.classifications.oldLooking.push(key);
+              }
+              if (predictions[4] > this.confidence) {
+                this.classifications.parked.push(key);
+              }
+              this.eyeballedCount++;
 
-            if (this.eyeballedCount >= this.imageCount) {
-              this.eyeballing = false;
-              this.eyeballCompleted = true;
-              this.updateSelections();
-            }
-            numOfWorkers--;
-            getNextTask();
+              if (this.eyeballedCount >= this.imageCount) {
+                this.eyeballing = false;
+                this.eyeballCompleted = true;
+                this.updateSelections();
+              }
+              numOfWorkers--;
+              getNextTask();
+            });
           };
 
           taskIndex++;
