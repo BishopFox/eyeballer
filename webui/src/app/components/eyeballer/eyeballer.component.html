@@ -24,7 +24,7 @@
   <mat-card>
     Drop your screenshots below:
     <br><br>
-    <ngx-dropzone (change)="onSelect($event); startEyeball()">
+    <ngx-dropzone (change)="onSelect($event)">
       <ngx-dropzone-label>
         Files dropped here are <span style="font-weight: bold">not uploaded anywhere.</span> No data leaves your computer at all on this tool.
       </ngx-dropzone-label>
@@ -43,10 +43,6 @@
 
 <!-- Progress Bar -->
 <div *ngIf="tfFilesCompleted && eyeballing && !eyeballCompleted">
-  <mat-card>
-    <h3>Loading Images: {{this.images.size}} of {{this.imageCount}}</h3>
-    <mat-progress-bar mode="determinate" [value]="loadPercent()"></mat-progress-bar>
-  </mat-card>
   <mat-card>
     <h3>Classifying: {{this.eyeballedCount}} of {{this.imageCount}}</h3>
     <mat-progress-bar mode="determinate" [value]="eyeballPercent()"></mat-progress-bar>
@@ -113,24 +109,6 @@
       </button>
       <a href="https://github.com/BishopFox/eyeballer#what-the-labels-mean" target="_blank" rel="noopener noreferrer">What do these labels mean?</a>
     </mat-card>
-
-    <div class="eyeballed-class-container">
-      <div *ngFor="let key of selectedScreens.slice(0, 8); let index = index" [attr.data-index]="index">
-        <mat-card class="result-card">
-          <mat-card-header>
-            <mat-card-title>
-                {{ key }}
-            </mat-card-title>
-          </mat-card-header>
-          <img class="preview-image" mat-card-image src="{{images.get(key)}}">
-          <span class="webapp-label">{{ isWebapp(key) }}</span>
-          <span class="custom-404-label">{{ isCustom404(key) }}</span>
-          <span class="login-label">{{ isLoginPage(key) }}</span>
-          <span class="old-looking-label">{{ isOldLooking(key) }}</span>
-          <span class="parked-label">{{ isParked(key) }}</span>
-        </mat-card>
-      </div>
-    </div>
   </div>
 
 </div>

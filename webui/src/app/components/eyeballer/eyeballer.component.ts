@@ -11,7 +11,6 @@ import * as tf from '@tensorflow/tfjs';
 export class EyeballerComponent implements OnInit {
 
   offset = tf.scalar(127.5);
-  images = new Map<string, string>();
   confidence = 0.5;
 
   width = 224;
@@ -19,10 +18,9 @@ export class EyeballerComponent implements OnInit {
 
   tfFilesCompleted = false;
   tfFiles: File[] = [];
+  model: any = null;
 
-  maxWorkers = 20;
   imageCount = 0;
-  loadedCount = 0;
   finishedLoading = false;
   eyeballing = false;
   eyeballCompleted = false;
@@ -58,15 +56,61 @@ export class EyeballerComponent implements OnInit {
 
   async onSelect(event) {
     this.imageCount = event.addedFiles.length;
-    await Promise.all(event.addedFiles.map(async (file) => {
-      const dataString = await this.dataURI(file);
-      this.images.set(file.name, dataString);
-    }));
+    this.eyeballing = true;
+    await this.classifyImages(event.addedFiles);
+    this.eyeballing = false;
+    this.eyeballCompleted = true;
+    await this.updateSelections();
   }
 
-  onRemove(event) {
-    this.images.delete(event.name);
+  async classifyImages(files) {
+    this.model = await tf.loadLayersModel(tf.io.browserFiles(this.tfFiles));
+    for(const file of files) {
+      await this.classify(file);
+      this.eyeballedCount++;
+    }
   }
+
+  async classify(file) {
+    const dataString = await this.dataURI(file);
+    const img = new Image(this.width, this.height);
+    img.src = dataString;
+    img.onerror = () => {
+      return;
+    }
+    img.onload = () => {
+      tf.tidy(() => {
+        const tensor = tf.browser.fromPixels(img)
+          .resizeNearestNeighbor([224, 224])
+          .toFloat()
+          .sub(this.offset)
+          .div(this.offset)
+          .expandDims();
+        const resultTensor = <tf.Tensor<tf.Rank>> this.model.predict(tensor);
+        const predictions = resultTensor.dataSync();
+        tensor.dispose();
+        resultTensor.dispose();
+        if (predictions[0] > this.confidence) {
+          this.classifications.custom404.push(file.name);
+        }
+        if (predictions[1] > this.confidence) {
+          this.classifications.loginPage.push(file.name);
+        }
+        if (predictions[2] > this.confidence) {
+          this.classifications.webapp.push(file.name);
+        }
+        if (predictions[3] > this.confidence) {
+          this.classifications.oldLooking.push(file.name);
+        }
+        if (predictions[4] > this.confidence) {
+          this.classifications.parked.push(file.name);
+        }
+      });
+    };
+
+  }
+
+
 
   isWebapp(key) {
     if(this.classifications.webapp.includes(key)) {
@@ -120,11 +164,6 @@ export class EyeballerComponent implements OnInit {
     const resp = await fetch(`/assets/tf/${base}`);
     const blob = await resp.blob();
     return new File([blob], base);
-  }
-
-  async startEyeball() {
-    await this.executeQueue();
-    await this.updateSelections();
   }
 
   async updateSelections() {
@@ -199,83 +238,6 @@ export class EyeballerComponent implements OnInit {
     this.selectedScreens = Array.from(selectedScreensSet);
   }
 
-  async executeQueue(): Promise<void> {
-    this.eyeballing = true;
-    const model = await tf.loadLayersModel(tf.io.browserFiles(this.tfFiles));
-    const keys = Array.from(this.images.keys());
-    let numOfWorkers = 0;
-    let taskIndex = 0;
-
-    return new Promise((complete) => {
-      const getNextTask = () => {
-        if (numOfWorkers < this.maxWorkers && taskIndex < this.imageCount) {
-          // Start the task
-          const img = new Image(this.width, this.height);
-          const key = keys[taskIndex];
-          img.src = this.images.get(key);
-          this.loadedCount++;
-          img.onerror = () => {
-            this.eyeballedCount++;
-            if (this.eyeballedCount >= this.imageCount) {
-              this.eyeballing = false;
-              this.eyeballCompleted = true;
-              this.updateSelections();
-            }
-            numOfWorkers--;
-            getNextTask();
-          }
-          img.onload = () => {
-            tf.tidy(() => {
-              const tensor = tf.browser.fromPixels(img)
-                .resizeNearestNeighbor([224, 224])
-                .toFloat()
-                .sub(this.offset)
-                .div(this.offset)
-                .expandDims();
-              const resultTensor = <tf.Tensor<tf.Rank>> model.predict(tensor);
-              const predictions = resultTensor.dataSync();
-              tensor.dispose();
-              resultTensor.dispose();
-              if (predictions[0] > this.confidence) {
-                this.classifications.custom404.push(key);
-              }
-              if (predictions[1] > this.confidence) {
-                this.classifications.loginPage.push(key);
-              }
-              if (predictions[2] > this.confidence) {
-                this.classifications.webapp.push(key);
-              }
-              if (predictions[3] > this.confidence) {
-                this.classifications.oldLooking.push(key);
-              }
-              if (predictions[4] > this.confidence) {
-                this.classifications.parked.push(key);
-              }
-              this.eyeballedCount++;
-
-              if (this.eyeballedCount >= this.imageCount) {
-                this.eyeballing = false;
-                this.eyeballCompleted = true;
-                this.updateSelections();
-              }
-              numOfWorkers--;
-              getNextTask();
-            });
-          };
-
-          taskIndex++;
-          numOfWorkers++;
-          // keep the chain going by calling ourselves
-          getNextTask();
-        } else if (numOfWorkers === 0 && taskIndex === this.imageCount) {
-          complete();
-        }
-      };
-
-      getNextTask();
-    });
-  }
-
   async dataURI(file: File): Promise<string> {
     const buf = await file.arrayBuffer();
     let ext = file.name.split('.').reverse()[0]?.toLocaleLowerCase();
@@ -287,10 +249,6 @@ export class EyeballerComponent implements OnInit {
 
   eyeballPercent() {
     return (this.eyeballedCount / this.imageCount) * 100;
-  }
-
-  loadPercent() {
-    return (this.images.size / this.imageCount) * 100;
   }
 
   restart() {
