@@ -21,7 +21,6 @@ export class EyeballerComponent implements OnInit {
   model: any = null;
 
   imageCount = 0;
-  finishedLoading = false;
   eyeballing = false;
   eyeballCompleted = false;
   eyeballedCount = 0;
