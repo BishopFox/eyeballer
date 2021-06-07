@@ -143,12 +143,12 @@ export class EyeballerComponent implements OnInit {
   }
 
   async fetchTfFiles() {
-    let resp = await fetch('/assets/tf/model.json');
+    let resp = await fetch('assets/tf/model.json');
     const manifest = await resp.json();
     const paths: string[] = Array.from(manifest.weightsManifest[0]?.paths);
 
     this.tfFiles = [];
-    resp = await fetch('/assets/tf/model.json');
+    resp = await fetch('assets/tf/model.json');
     const blob = await resp.blob();
     this.tfFiles.push(new File([blob], 'model.json'));
     await Promise.all(paths.map(async (path) => {
@@ -160,7 +160,7 @@ export class EyeballerComponent implements OnInit {
 
   async fetchTfFile(name: string): Promise<File> {
     const base = name.split('/').reverse()[0];
-    const resp = await fetch(`/assets/tf/${base}`);
+    const resp = await fetch(`assets/tf/${base}`);
     const blob = await resp.blob();
     return new File([blob], base);
   }
