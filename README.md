@@ -43,7 +43,7 @@ Parked domains are websites that look real, but aren't valid attack surface. The
 
 Download required packages on pip:
 ```
-sudo pip3 install -r requirements.txt
+sudo pip3 install git+https://github.com/BishopFox/eyeballer.git
 ```
 
 Or if you want GPU support:
@@ -75,17 +75,33 @@ NOTE: For best results, make sure you screenshot your websites in a native 1.6x 
 
 To eyeball some screenshots, just run the "predict" mode:
 
+### CLI
 ```
-eyeballer.py --weights YOUR_WEIGHTS.h5 predict YOUR_FILE.png
+eyeballer --weights YOUR_WEIGHTS.h5 predict YOUR_FILE.png
 ```
 
 Or for a whole directory of files:
 
 ```
-eyeballer.py --weights YOUR_WEIGHTS.h5 predict PATH_TO/YOUR_FILES/
+eyeballer --weights YOUR_WEIGHTS.h5 predict PATH_TO/YOUR_FILES/
 ```
 
 Eyeballer will spit the results back to you in human readable format (a `results.html` file so you can browse it easily) and machine readable format (a `results.csv` file).
+
+### Python
+For using eyeballer right from Python code, use the following snippet:
+```
+from eyeballer.model import EyeballModel
+model = EyeballModel(weights_file=weights_file_path)
+model.predict(image_path)
+# Result:
+# [{'filename': '/...',
+#  'custom404': ...,
+#  'login': ...,
+#  'webapp': ...,
+#  'oldlooking': ...,
+#  'parked': ...}]
+```
 
 ## Performance
 
