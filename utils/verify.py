@@ -15,11 +15,14 @@ with open("labels.csv", newline="") as csvfile:
     for row in csvreader:
         label_list.append(row["filename"])
 
+    print(len(file_list), "files")
+    print(len(label_list), "labels")
+
     # Loop through the file
     print("Rows in labels.csv, but no image exists:")
     for label in label_list:
         if label not in file_list:
-            print(row["filename"])
+            print(label)
 
     print("Images that exist, but don't have labels:")
     i = 0
