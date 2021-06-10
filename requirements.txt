@@ -1,10 +1,1 @@
-Augmentor
-click
-matplotlib
-numpy
-pandas
-pillow
-sklearn
-tensorflow
-jinja2
-progressbar2
+-e .
