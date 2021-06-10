@@ -59,15 +59,20 @@ For the latest pretrained weights, check out the releases here on GitHub.
 
 **Training Data** You can find our training data here:
 
-https://www.dropbox.com/s/rpylhiv2g0kokts/eyeballer-3.0.zip?dl=1
+https://www.kaggle.com/altf42600/pentest-screensots
 
 There's two things you need from the training data:
 
 1. `images/` folder, containing all the screenshots (resized down to 224x224)
 2. `labels.csv` that has all the labels
-3. `bishop-fox-pretrained-v3.h5` A pretrained weights file you can use right out of the box without training.
 
-Copy all three into the root of the Eyeballer code tree.
+Copy both into the root of the Eyeballer code tree.
+
+Additionally, you can find a pretrained weights file you can use right out of the box without training.  
+
+1. `bishop-fox-pretrained-vN.h5`
+
+It's here on GitHub, look at the `releases` section for the latest one.
 
 ## Predicting Labels
 
