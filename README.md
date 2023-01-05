@@ -7,6 +7,7 @@ Give those screenshots of yours a quick eyeballing.
 
 Eyeballer is meant for large-scope network penetration tests where you need to find "interesting" targets from a huge set of web-based hosts. Go ahead and use your favorite screenshotting tool like normal (EyeWitness or GoWitness) and then run them through Eyeballer to tell you what's likely to contain vulnerabilities, and what isn't.
 
+Give it a try live at: https://eyeballer.bishopfox.com
 
 ### Example Labels
 
