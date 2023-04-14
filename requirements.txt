@@ -9,3 +9,4 @@ tensorflow
 jinja2
 progressbar2
 scipy
+scikit-learn
