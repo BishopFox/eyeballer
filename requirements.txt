@@ -4,7 +4,7 @@ matplotlib
 numpy
 pandas
 pillow
-sklearn
+scikit-learn
 tensorflow
 jinja2
 progressbar2
