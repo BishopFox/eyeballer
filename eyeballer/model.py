@@ -58,7 +58,7 @@ class EyeballModel:
             try:
                 self.model.load_weights(weights_file)
             except OSError:
-                print("ERROR: Unable to open weights file '{}'".foramt(weights_file))
+                print("ERROR: Unable to open weights file '{}'".format(weights_file))
                 sys.exit(-1)
             print("Loaded model from file.")
         else:
